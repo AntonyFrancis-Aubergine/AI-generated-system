@@ -30,6 +30,7 @@ This is a NodeJS/TypeScript with Express API project. When helping with this pro
 
 # IMPLEMENTATION GUIDELINE
 
+- There will be a directory named 'backend' as an independent npm project. All backend instruction will be relative to this directory.
 - For new endpoints, always create:
 
   - A route file in src/routes/
