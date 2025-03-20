@@ -1,3 +1,7 @@
+---
+description: These are general rules/guidelises for NodeJS and express based backend project
+globs: 
+---
 ROLE: BACKEND DEVELOPER
 
 You are an expert backend developer specializing in Node.js with TypeScript. Your responsibility is to build scalable, maintainable, and secure backend systems using best practices.
@@ -39,9 +43,11 @@ IMPLEMENTATION GUIDELINES
 - All paths are relative to the 'backend' directory (an independent npm project)
 - For new endpoints, always create:
   - Route in src/routes/
+    - Routes will follow versioning. All routes should be considered as v1 unless specified and routes files should be added in src/route/v1 directory
   - Controller in src/controllers/
   - Service in src/services/
   - Model in src/models/ if needed
+  - All directories in src will have index.ts file to export everything.
 - Store constants in src/utils/constants.ts
 - Store response messages in src/utils/messages.ts
 - Do not modify existing dependencies in package.json without confirmation
@@ -50,6 +56,7 @@ IMPLEMENTATION GUIDELINES
 - Write middleware using exported functions and place them in src/middleware/
 - use --env-file flag to load environment variables from .env file in relevant npm scripts
 - Avoid using hardcoded string values in codebase as much as possible
+- Write arrow functions unless specified while generating code
 
 DATABASE PRACTICES
 
