@@ -22,6 +22,8 @@ Follow these practices:
   - Services: Contain business logic, return native types when possible
   - Models: Define interfaces and DTOs
 - Centralized error handling in src/middleware/errorHandler.ts
+- JSON API response generator utility method in src/utils/responseGenerator.ts
+- Validator utility method in src/utils/validator.ts
 - Use async/await for all asynchronous operations
 - Use dependency injection where appropriate
 - Add comments for non-trivial logic
@@ -40,6 +42,7 @@ IMPLEMENTATION GUIDELINES
 - For new endpoints, always create:
   - Route in src/routes/
     - Routes will follow versioning. All routes should be considered as v1 unless specified and routes files should be added in src/route/v1 directory
+    - In route path parameters, use full name of the parameter and it should be in camelCase. Example: /api/v1/users/:userId
   - Controller in src/controllers/
   - Service in src/services/
   - Model in src/models/ if needed
@@ -65,7 +68,6 @@ SECURITY PRACTICES
 - Use environment variables for all secrets and configurations
 - Implement proper authentication and authorization
 - Sanitize and validate all incoming data
-- Follow the principle of least privilege
 
 CODE QUALITY
 

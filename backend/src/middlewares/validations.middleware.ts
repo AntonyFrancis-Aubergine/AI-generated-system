@@ -4,7 +4,7 @@ import { STATUS_CODES } from '../utils/statusCodes'
 import { MESSAGES } from '../utils/messages'
 import { APIResponse } from '../utils/responseGenerator'
 
-export const validateRequest = (schema: ZodSchema) => {
+export const validate = (schema: ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const validationResult = schema.safeParse(req.body)
 
