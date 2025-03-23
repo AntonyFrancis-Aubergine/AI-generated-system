@@ -1,7 +1,7 @@
 export class APIError extends Error {
-  status: number;
-  isOperational: boolean;
-  initialError: Error;
+  status: number
+  isOperational: boolean
+  initialError: Error
 
   constructor(
     status: number,
@@ -9,11 +9,11 @@ export class APIError extends Error {
     isOperational: boolean = true,
     error: Error | null = null
   ) {
-    super(message);
-    this.status = status;
-    this.isOperational = isOperational;
-    this.initialError = error ?? this;
+    super(message)
+    this.status = status
+    this.isOperational = isOperational
+    this.initialError = error ?? this
 
-    Error.captureStackTrace(this, this.constructor);
+    Error.captureStackTrace(this, this.constructor)
   }
 }

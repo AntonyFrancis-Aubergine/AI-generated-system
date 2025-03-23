@@ -8,7 +8,7 @@ export const errorConverter = (
   error: any,
   _req: Request,
   _res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): void => {
   let err: APIError
 
@@ -54,7 +54,7 @@ export const errorConverter = (
         STATUS_CODES.SERVER_ERROR.INTERNAL_SERVER_ERROR,
         MESSAGES.ERROR,
         false,
-        error,
+        error
       )
       break
   }
@@ -66,7 +66,7 @@ export const errorHandler = (
   error: APIError,
   _req: Request,
   res: Response,
-  _next: NextFunction,
+  _next: NextFunction
 ): void => {
   console.error(JSON.stringify(error, null, 2))
 
@@ -86,7 +86,9 @@ export const errorHandler = (
   //   );
   // }
 
-  res.status(error.status).json(APIResponse.sendError({ message: error.message }))
+  res
+    .status(error.status)
+    .json(APIResponse.sendError({ message: error.message }))
 
   return
 }

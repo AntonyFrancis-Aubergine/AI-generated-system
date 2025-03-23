@@ -50,4 +50,4 @@ export const MESSAGES = {
   RATE_LIMIT_EXCEEDED: 'You have exceeded your request limit',
 
   // * Add API specific messages here
-};
+}
