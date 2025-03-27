@@ -1,8 +1,7 @@
-import { PrismaClient, UserRole } from '@prisma/client'
+import { UserRole } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { CONSTANTS } from '../src/utils/constants'
-
-const prisma = new PrismaClient()
+import { prisma } from '../src/config/db'
 
 async function main() {
   // Check if admin already exists

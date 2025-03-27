@@ -1,4 +1,4 @@
-import { PrismaClient, User, UserRole } from '@prisma/client'
+import { User, UserRole } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { CONSTANTS } from '../utils/constants'
@@ -6,9 +6,7 @@ import { SignUpRequestBody, JwtPayload, AuthTokens } from '../types/auth.types'
 import { APIError } from '../utils/customError'
 import { STATUS_CODES } from '../utils/statusCodes'
 import { MESSAGES } from '../utils/messages'
-
-// Initialize Prisma client
-const prisma = new PrismaClient()
+import { prisma } from '../config/db'
 
 /**
  * Get user by email

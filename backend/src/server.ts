@@ -1,14 +1,11 @@
 import express, { Express } from 'express'
-import { PrismaClient } from '@prisma/client'
 import routes from './routes'
 import { errorConverter, errorHandler } from './middlewares/error.middleware'
+import { prisma } from './config/db'
 
 // Initialize app
 const app: Express = express()
 const PORT = process.env.PORT || 3000
-
-// Initialize Prisma client
-const prisma = new PrismaClient()
 
 // Middleware
 app.use(express.json())
@@ -21,19 +18,22 @@ app.use(routes)
 app.use(errorConverter)
 app.use(errorHandler)
 
-// Start server
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`)
-})
-
-// Handle server shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received: closing HTTP server')
-  server.close(async () => {
-    await prisma.$disconnect()
-    console.log('HTTP server closed')
-    process.exit(0)
+// Only start the server if this file is run directly (not when imported in tests)
+if (process.env.NODE_ENV !== 'test') {
+  // Start server
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`)
   })
-})
+
+  // Handle server shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server')
+    server.close(async () => {
+      await prisma.$disconnect()
+      console.log('HTTP server closed')
+      process.exit(0)
+    })
+  })
+}
 
 export default app
