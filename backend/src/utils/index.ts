@@ -1,6 +1,7 @@
 export * from './constants'
 export * from './customError'
 export * from './messages'
+export * from './pagination'
 export * from './responseGenerator'
 export * from './statusCodes'
 export * from './wrapper'

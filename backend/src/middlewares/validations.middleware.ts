@@ -25,3 +25,30 @@ export const validate = (schema: ZodSchema) => {
     next()
   }
 }
+
+export const validateQuery = (schema: ZodSchema) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const validationResult = schema.safeParse(req.query)
+
+    if (!validationResult.success) {
+      const errorDetails = validationResult.error.errors
+        .map((err) => err.message)
+        .join(', ')
+      res.status(STATUS_CODES.CLIENT_ERROR.BAD_REQUEST).json(
+        APIResponse.sendError({
+          message: MESSAGES.VALIDATION_ERR,
+          data: null,
+          extra: { details: errorDetails },
+        })
+      )
+      return
+    }
+
+    // Optionally assign parsed values back to query
+    if ('data' in validationResult) {
+      req.query = validationResult.data as any
+    }
+
+    next()
+  }
+}
