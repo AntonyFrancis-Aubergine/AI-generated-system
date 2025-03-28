@@ -11,6 +11,7 @@ import { STATUS_CODES } from '../utils/statusCodes'
 import { MESSAGES } from '../utils/messages'
 import { APIResponse } from '../utils/responseGenerator'
 import { catchAsync } from '../utils/wrapper'
+import { UserRole } from '@prisma/client'
 
 /**
  * Create a new user (Admin only)
@@ -34,6 +35,44 @@ export const createUser = catchAsync(
     }
 
     const user = await createUserService(userData)
+
+    res.status(STATUS_CODES.SUCCESS.CREATED).json(
+      APIResponse.sendSuccess({
+        message: MESSAGES.CREATE_SUCCESS('User account'),
+        data: { user },
+      })
+    )
+  }
+)
+
+/**
+ * Self-register a new user (Public route, always creates an EMPLOYEE user)
+ * @param req Express request
+ * @param res Express response
+ * @param next Express next function
+ */
+export const selfRegister = catchAsync(
+  async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
+    const userData: SignUpRequestBody = req.body
+
+    // Check if user already exists
+    const existingUser = await getUserByEmail(userData.email)
+    if (existingUser) {
+      res.status(STATUS_CODES.CLIENT_ERROR.CONFLICT).json(
+        APIResponse.sendError({
+          message: MESSAGES.EXISTS('User with this email'),
+        })
+      )
+      return
+    }
+
+    // Force role to be EMPLOYEE for self-registration
+    const userDataWithRole = {
+      ...userData,
+      role: UserRole.EMPLOYEE,
+    }
+
+    const user = await createUserService(userDataWithRole)
 
     res.status(STATUS_CODES.SUCCESS.CREATED).json(
       APIResponse.sendSuccess({

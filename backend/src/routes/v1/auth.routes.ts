@@ -1,5 +1,9 @@
 import { Router } from 'express'
-import { createUser, login } from '../../controllers/auth.controller'
+import {
+  createUser,
+  login,
+  selfRegister,
+} from '../../controllers/auth.controller'
 import { validate } from '../../middlewares/validations.middleware'
 import { verifyToken, requireRole } from '../../middlewares/auth.middleware'
 import { SignUpSchema, SignInSchema } from '../../types/auth.types'
@@ -9,6 +13,7 @@ const router = Router()
 
 // Public routes
 router.post('/login', validate(SignInSchema), login)
+router.post('/register', validate(SignUpSchema), selfRegister)
 
 // Protected routes - Admin only
 router.post(
