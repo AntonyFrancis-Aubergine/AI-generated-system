@@ -1,0 +1,356 @@
+{
+  "info": {
+    "name": "Office Cab booking App",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API collection for Office Cab Booking Service MVP"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "Authentication endpoints for user login and registration",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"yourpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Login with user credentials to get authentication tokens. Returns access token and user details upon successful authentication."
+          },
+          "response": [
+            {
+              "name": "Successful Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"yourpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "x-access-token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"User retrieved successfully\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"clk9f8s0g0000qw1j8y7g5p2l\",\n      \"email\": \"user@example.com\",\n      \"name\": \"Test User\",\n      \"role\": \"USER\",\n      \"contactNumber\": \"1234567890\",\n      \"profileImageUrl\": null,\n      \"isActive\": true,\n      \"createdAt\": \"2023-06-01T10:00:00.000Z\",\n      \"updatedAt\": \"2023-06-01T10:00:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n      \"refreshToken\": \"\"\n    }\n  },\n  \"extra\": null\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"email or password is invalid\",\n  \"data\": null,\n  \"extra\": null\n}"
+            },
+            {
+              "name": "User Inactive",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"inactive@example.com\",\n  \"password\": \"yourpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Login Failed, User is Archived\",\n  \"data\": null,\n  \"extra\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create User (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-access-token",
+                "value": "{{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"securepassword\",\n  \"name\": \"New User\",\n  \"contactNumber\": \"9876543210\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "users"]
+            },
+            "description": "Create a new user (Admin access only). Requires authentication and admin role."
+          },
+          "response": [
+            {
+              "name": "Successful Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-access-token",
+                    "value": "{{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"securepassword\",\n  \"name\": \"New User\",\n  \"contactNumber\": \"9876543210\",\n  \"role\": \"USER\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "users"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"User account created successfully\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"clk9f8s0g0001qw1j8y7g5p2m\",\n      \"email\": \"newuser@example.com\",\n      \"name\": \"New User\",\n      \"role\": \"USER\",\n      \"contactNumber\": \"9876543210\",\n      \"profileImageUrl\": null,\n      \"isActive\": true,\n      \"createdAt\": \"2023-06-01T10:00:00.000Z\",\n      \"updatedAt\": \"2023-06-01T10:00:00.000Z\"\n    }\n  },\n  \"extra\": null\n}"
+            },
+            {
+              "name": "Conflict - User Exists",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-access-token",
+                    "value": "{{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"existing@example.com\",\n  \"password\": \"securepassword\",\n  \"name\": \"Existing User\",\n  \"contactNumber\": \"9876543210\",\n  \"role\": \"USER\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "users"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"User with this email already exists\",\n  \"data\": null,\n  \"extra\": null\n}"
+            },
+            {
+              "name": "Unauthorized - No Token",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"securepassword\",\n  \"name\": \"New User\",\n  \"contactNumber\": \"9876543210\",\n  \"role\": \"USER\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "users"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthorized access\",\n  \"data\": null,\n  \"extra\": null\n}"
+            },
+            {
+              "name": "Forbidden - Not Admin",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-access-token",
+                    "value": "{{userAccessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"securepassword\",\n  \"name\": \"New User\",\n  \"contactNumber\": \"9876543210\",\n  \"role\": \"USER\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "users"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthorized access\",\n  \"data\": null,\n  \"extra\": null\n}"
+            },
+            {
+              "name": "Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-access-token",
+                    "value": "{{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"invalid-email\",\n  \"password\": \"\",\n  \"name\": \"New User\",\n  \"contactNumber\": \"123\",\n  \"role\": \"INVALID_ROLE\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "users"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Invalid Data\",\n  \"data\": {\n    \"errors\": [\n      {\n        \"path\": \"email\",\n        \"message\": \"Invalid email\"\n      },\n      {\n        \"path\": \"password\",\n        \"message\": \"password is required and cannot be empty\"\n      },\n      {\n        \"path\": \"contactNumber\",\n        \"message\": \"String must contain exactly 10 character(s)\"\n      },\n      {\n        \"path\": \"role\",\n        \"message\": \"Invalid enum value. Expected 'ADMIN' | 'USER' | 'DRIVER'\"\n      }\n    ]\n  },\n  \"extra\": null\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "Base URL for API requests"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT Access Token for authenticated requests"
+    },
+    {
+      "key": "userAccessToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT Access Token for non-admin user (for testing permission restrictions)"
+    }
+  ]
+}

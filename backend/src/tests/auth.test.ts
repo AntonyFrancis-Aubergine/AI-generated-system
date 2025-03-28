@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import supertest from 'supertest'
 import { UserRole } from '@prisma/client'
 import { MESSAGES } from '../utils/messages'
