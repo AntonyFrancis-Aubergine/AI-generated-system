@@ -1,0 +1,599 @@
+{
+  "info": {
+    "name": "Cab Booking Service API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API collection for Cab Booking Service MVP"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "Authentication endpoints for user login and registration",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"yourpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Login with user credentials to get authentication tokens. Returns access token and user details upon successful authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"securepassword\",\n  \"name\": \"New User\",\n  \"contactNumber\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            },
+            "description": "Self-register a new user account. By default, users are registered with the USER role."
+          },
+          "response": []
+        },
+        {
+          "name": "Create User (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newstaff@example.com\",\n  \"password\": \"securepassword\",\n  \"name\": \"Staff Member\",\n  \"contactNumber\": \"9876543210\",\n  \"role\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "users"]
+            },
+            "description": "Create a new user with any role (Admin access only). Requires authentication and admin role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "User management endpoints",
+      "item": [
+        {
+          "name": "Get Users (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users?page=1&limit=10&name=&email=&role=&isActive=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (1-based)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of records per page"
+                },
+                {
+                  "key": "name",
+                  "value": "",
+                  "description": "Filter by name"
+                },
+                {
+                  "key": "email",
+                  "value": "",
+                  "description": "Filter by email"
+                },
+                {
+                  "key": "role",
+                  "value": "",
+                  "description": "Filter by role (USER, ADMIN, DRIVER)"
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "description": "Filter by active status"
+                }
+              ]
+            },
+            "description": "Get a list of users with pagination and filtering options. Admin access only."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Vehicles",
+      "description": "Vehicle management endpoints",
+      "item": [
+        {
+          "name": "Create Vehicle (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"registrationNumber\": \"KA01AB1234\",\n  \"model\": \"Swift Dzire\",\n  \"make\": \"Maruti Suzuki\",\n  \"year\": 2022,\n  \"color\": \"White\",\n  \"seatingCapacity\": 4,\n  \"fuelType\": \"Petrol\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/vehicles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "vehicles"]
+            },
+            "description": "Create a new vehicle entry in the system. Admin access only."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Vehicles (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/vehicles?page=1&limit=10&make=&model=&status=&isActive=true&isAssigned=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "vehicles"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Records per page"
+                },
+                {
+                  "key": "make",
+                  "value": "",
+                  "description": "Filter by vehicle make"
+                },
+                {
+                  "key": "model",
+                  "value": "",
+                  "description": "Filter by vehicle model"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status (ACTIVE, MAINTENANCE, INACTIVE)"
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "description": "Filter by active status"
+                },
+                {
+                  "key": "isAssigned",
+                  "value": "false",
+                  "description": "Filter by assignment status"
+                }
+              ]
+            },
+            "description": "Get a list of vehicles with pagination and filtering options. Admin access only."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Vehicle by ID (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/vehicles/:vehicleId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "vehicles", ":vehicleId"],
+              "variable": [
+                {
+                  "key": "vehicleId",
+                  "value": "uuid-goes-here",
+                  "description": "UUID of the vehicle"
+                }
+              ]
+            },
+            "description": "Get details of a specific vehicle by ID. Admin access only."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Vehicle (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"registrationNumber\": \"KA01AB1234\",\n  \"model\": \"Swift Dzire\",\n  \"make\": \"Maruti Suzuki\",\n  \"year\": 2022,\n  \"color\": \"Silver\",\n  \"seatingCapacity\": 4,\n  \"fuelType\": \"Petrol\",\n  \"status\": \"MAINTENANCE\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/vehicles/:vehicleId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "vehicles", ":vehicleId"],
+              "variable": [
+                {
+                  "key": "vehicleId",
+                  "value": "uuid-goes-here",
+                  "description": "UUID of the vehicle to update"
+                }
+              ]
+            },
+            "description": "Update a vehicle's details. Only need to include fields that require updates. Admin access only."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Vehicle (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/vehicles/:vehicleId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "vehicles", ":vehicleId"],
+              "variable": [
+                {
+                  "key": "vehicleId",
+                  "value": "uuid-goes-here",
+                  "description": "UUID of the vehicle to delete"
+                }
+              ]
+            },
+            "description": "Delete a vehicle from the system. Admin access only."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Drivers",
+      "description": "Driver management endpoints",
+      "item": [
+        {
+          "name": "Create Driver Profile (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"uuid-of-user\",\n  \"licenseNumber\": \"DL12345678\",\n  \"licenseExpiry\": \"2025-12-31\",\n  \"experienceYears\": 5,\n  \"isAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/drivers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "drivers"]
+            },
+            "description": "Create a driver profile for an existing user. Admin access only."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Driver Profiles (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/drivers?page=1&limit=10&isAvailable=true&isActive=true&hasVehicle=&minExperience=2&minRating=4",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "drivers"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Records per page"
+                },
+                {
+                  "key": "isAvailable",
+                  "value": "true",
+                  "description": "Filter by availability"
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "description": "Filter by active status"
+                },
+                {
+                  "key": "hasVehicle",
+                  "value": "",
+                  "description": "Filter by vehicle assignment"
+                },
+                {
+                  "key": "minExperience",
+                  "value": "2",
+                  "description": "Filter by minimum experience years"
+                },
+                {
+                  "key": "minRating",
+                  "value": "4",
+                  "description": "Filter by minimum rating"
+                }
+              ]
+            },
+            "description": "Get a list of driver profiles with pagination and filtering options. Admin access only."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Driver Profile by ID (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/drivers/:driverId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "drivers", ":driverId"],
+              "variable": [
+                {
+                  "key": "driverId",
+                  "value": "uuid-goes-here",
+                  "description": "UUID of the driver profile"
+                }
+              ]
+            },
+            "description": "Get details of a specific driver profile by ID. Admin access only."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Driver Profile by User ID (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/drivers/user/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "drivers", "user", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "uuid-goes-here",
+                  "description": "UUID of the user"
+                }
+              ]
+            },
+            "description": "Get driver profile by user ID. Admin access only."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Driver Profile (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"licenseNumber\": \"DL98765432\",\n  \"licenseExpiry\": \"2026-12-31\",\n  \"experienceYears\": 6,\n  \"isAvailable\": true,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/drivers/:driverId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "drivers", ":driverId"],
+              "variable": [
+                {
+                  "key": "driverId",
+                  "value": "uuid-goes-here",
+                  "description": "UUID of the driver profile to update"
+                }
+              ]
+            },
+            "description": "Update a driver's profile details. Only need to include fields that require updates. Admin access only."
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Vehicle to Driver (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleId\": \"uuid-of-vehicle\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/drivers/:driverId/vehicle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "drivers", ":driverId", "vehicle"],
+              "variable": [
+                {
+                  "key": "driverId",
+                  "value": "uuid-goes-here",
+                  "description": "UUID of the driver profile"
+                }
+              ]
+            },
+            "description": "Assign a vehicle to a driver. Admin access only."
+          },
+          "response": []
+        },
+        {
+          "name": "Unassign Vehicle from Driver (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "description": "Admin access token required"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/drivers/:driverId/vehicle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "drivers", ":driverId", "vehicle"],
+              "variable": [
+                {
+                  "key": "driverId",
+                  "value": "uuid-goes-here",
+                  "description": "UUID of the driver profile"
+                }
+              ]
+            },
+            "description": "Remove vehicle assignment from a driver. Admin access only."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "Base URL for API requests"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT Access Token for authenticated requests"
+    }
+  ]
+}

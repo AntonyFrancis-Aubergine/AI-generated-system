@@ -50,4 +50,18 @@ export const MESSAGES = {
   RATE_LIMIT_EXCEEDED: 'You have exceeded your request limit',
 
   // * Add API specific messages here
+  VEHICLE: {
+    ALREADY_ASSIGNED: 'Vehicle is already assigned to another driver',
+    INVALID_REGISTRATION: 'Invalid vehicle registration number',
+    INVALID_YEAR: 'Vehicle year is invalid',
+    INVALID_SEATING_CAPACITY: 'Invalid seating capacity',
+  },
+
+  DRIVER: {
+    INVALID_LICENSE: 'Invalid driver license number',
+    INVALID_LICENSE_EXPIRY: 'License expiry date must be in the future',
+    INVALID_EXPERIENCE: 'Experience years value is invalid',
+    INVALID_RATING: 'Rating must be between 0 and 5',
+    ALREADY_HAS_VEHICLE: 'Driver already has a vehicle assigned',
+  },
 }

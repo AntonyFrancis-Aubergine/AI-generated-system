@@ -2,6 +2,9 @@ import { prisma } from '../config/db'
 import { PaginationParams, PaginatedResponse } from '../types/common.types'
 import { UserListItem, UserListQueryParams } from '../types/user.types'
 import { CONSTANTS } from '../utils/constants'
+import { PrismaClient } from '@prisma/client'
+
+const prismaClient = new PrismaClient()
 
 /**
  * List users with pagination and filtering
@@ -88,4 +91,17 @@ export const listUsers = async (
       totalItems,
     },
   }
+}
+
+/**
+ * Get a user by ID
+ * @param id User ID
+ * @returns User or null if not found
+ */
+export const getUserById = async (id: string) => {
+  const user = await prismaClient.user.findUnique({
+    where: { id },
+  })
+
+  return user
 }

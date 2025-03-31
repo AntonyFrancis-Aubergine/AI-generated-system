@@ -20,19 +20,69 @@ enum UserRole {
   DRIVER
 }
 
+// Vehicle status as enum
+enum VehicleStatus {
+  ACTIVE
+  MAINTENANCE
+  INACTIVE
+}
+
 // User model for authentication and user management
 model User {
-  id              String    @id @default(uuid())
-  email           String    @unique
+  id              String         @id @default(uuid())
+  email           String         @unique
   password        String
   name            String
-  role            UserRole  @default(EMPLOYEE)
+  role            UserRole       @default(EMPLOYEE)
   refreshToken    String?   
   contactNumber   String?
   profileImageUrl String?
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  isActive        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  driverProfile   DriverProfile?
 
   @@map("users")
+}
+
+// Vehicle model for storing vehicle details
+model Vehicle {
+  id                 String         @id @default(uuid())
+  registrationNumber String         @unique
+  model              String
+  make               String
+  year               Int
+  color              String
+  seatingCapacity    Int
+  fuelType           String
+  status             VehicleStatus  @default(ACTIVE)
+  isActive           Boolean        @default(true)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  driverProfile      DriverProfile?
+
+  @@map("vehicles")
+}
+
+// DriverProfile model for storing driver-specific details
+model DriverProfile {
+  id                 String   @id @default(uuid())
+  licenseNumber      String   @unique
+  licenseExpiry      DateTime
+  experienceYears    Int      @default(0)
+  rating             Float?   @default(0)
+  isAvailable        Boolean  @default(true)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  // One-to-one relationship with User
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // One-to-one relationship with Vehicle
+  vehicleId          String?  @unique
+  vehicle            Vehicle? @relation(fields: [vehicleId], references: [id])
+
+  @@map("driver_profiles")
 }
