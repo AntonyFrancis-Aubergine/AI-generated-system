@@ -32,7 +32,7 @@ model User {
   updatedAt DateTime  @updatedAt @map("updated_at")
   
   instructedClasses  FitnessClass[]
-  bookings        FitnessClassBookings[]
+  bookings        FitnessClassBooking[]
 
   @@map("users")
 }
@@ -61,12 +61,12 @@ model FitnessClass {
 
   category   FitnessClassCategory @relation(fields: [categoryId], references: [id])
   instructor User                 @relation(fields: [instructorId], references: [id])
-  bookings   FitnessClassBookings[]
+  bookings   FitnessClassBooking[]
 
   @@map("fitness_classes")
 }
 
-model FitnessClassBookings {
+model FitnessClassBooking {
   id       String @id @default(uuid())
   userId   String @map("user_id")
   fitnessClassId  String @map("fitness_class_id")
