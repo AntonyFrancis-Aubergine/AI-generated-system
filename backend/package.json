@@ -1,5 +1,5 @@
 {
-  "name": "cab-boking-service",
+  "name": "fitness-class-booking-service",
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
@@ -16,7 +16,9 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "@prisma/client": "^6.5.0",
     "express": "^4.21.2",
+    "prisma": "^6.5.0",
     "zod": "^3.24.2"
   }
 }
