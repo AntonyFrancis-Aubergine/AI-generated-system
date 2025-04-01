@@ -62,6 +62,7 @@ DATABASE PRACTICES
 - Use Prisma ORM for all database operations
 - Define schema in prisma/schema.prisma
 - Do not generate Prisma migrations unless explicitly instructed
+- Use Prisma client exported from src/config/db.ts throughout the project
 
 SECURITY PRACTICES
 
