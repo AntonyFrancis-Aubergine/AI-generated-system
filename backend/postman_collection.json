@@ -138,6 +138,77 @@
       "description": "User authentication endpoints"
     },
     {
+      "name": "Fitness Classes",
+      "item": [
+        {
+          "name": "Get Available Fitness Classes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/fitness-classes?page=1&limit=10&name=yoga",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "fitness-classes"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items per page"
+                },
+                {
+                  "key": "name",
+                  "value": "yoga",
+                  "description": "Search by class name (optional)"
+                },
+                {
+                  "key": "categoryId",
+                  "value": "",
+                  "description": "Filter by category ID (optional)",
+                  "disabled": true
+                },
+                {
+                  "key": "instructorId",
+                  "value": "",
+                  "description": "Filter by instructor ID (optional)",
+                  "disabled": true
+                },
+                {
+                  "key": "startDateFrom",
+                  "value": "",
+                  "description": "Filter classes starting after this date (ISO format, optional)",
+                  "disabled": true
+                },
+                {
+                  "key": "startDateTo",
+                  "value": "",
+                  "description": "Filter classes starting before this date (ISO format, optional)",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get a list of available fitness classes for users. Only shows classes that start more than 1 hour from now. Requires authentication. Returns a paginated result with fitness class data."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for users to interact with fitness classes"
+    },
+    {
       "name": "Admin",
       "item": [
         {
