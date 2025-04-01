@@ -61,3 +61,48 @@ export interface FitnessClassResponse {
     fitnessClassId: string
   }>
 }
+
+/**
+ * Interface for fitness class filtering and searching
+ */
+export interface FitnessClassFilters {
+  /**
+   * Search by name
+   */
+  name?: string
+
+  /**
+   * Filter by category ID
+   */
+  categoryId?: string
+
+  /**
+   * Filter by instructor ID
+   */
+  instructorId?: string
+
+  /**
+   * Filter classes starting after this date (ISO format)
+   */
+  startDateFrom?: string
+
+  /**
+   * Filter classes starting before this date (ISO format)
+   */
+  startDateTo?: string
+}
+
+/**
+ * Interface for fitness class query params
+ */
+export interface FitnessClassQueryParams extends FitnessClassFilters {
+  /**
+   * Page number for pagination
+   */
+  page?: string
+
+  /**
+   * Number of items per page
+   */
+  limit?: string
+}

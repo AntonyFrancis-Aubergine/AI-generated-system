@@ -82,6 +82,15 @@ A Postman collection is included in the project root (`postman_collection.json`)
 
 #### Fitness Classes
 
+- `GET /api/v1/fitness-classes` - Get all fitness classes with filtering and pagination (Admin only)
+  - Query parameters:
+    - `page` - Page number (default: 1)
+    - `limit` - Items per page (default: 10)
+    - `name` - Filter by class name
+    - `categoryId` - Filter by category ID
+    - `instructorId` - Filter by instructor ID
+    - `startDateFrom` - Filter classes starting after this date
+    - `startDateTo` - Filter classes starting before this date
 - `POST /api/v1/fitness-classes` - Create a fitness class (Admin only)
 
 ## Project Structure

@@ -8,7 +8,19 @@ import { CONSTANTS } from '../../utils/constants'
 const fitnessClassRouter = Router()
 
 /**
- * @route POST /api/v1/fitnessClasses
+ * @route GET /api/v1/fitness-classes
+ * @desc Get all fitness classes with filtering and pagination
+ * @access Restricted to ADMIN
+ */
+fitnessClassRouter.get(
+  '/',
+  authenticate,
+  hasRole([CONSTANTS.AUTH.ROLES.ADMIN]),
+  FitnessClassController.getAllFitnessClasses
+)
+
+/**
+ * @route POST /api/v1/fitness-classes
  * @desc Create a new fitness class
  * @access Restricted to ADMIN
  */
