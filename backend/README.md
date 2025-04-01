@@ -80,9 +80,9 @@ A Postman collection is included in the project root (`postman_collection.json`)
 - `POST /api/v1/auth/register` - Register a new user
 - `POST /api/v1/auth/login` - Login a user
 
-#### Fitness Classes
+#### Admin Endpoints (All require ADMIN role)
 
-- `GET /api/v1/fitness-classes` - Get all fitness classes with filtering and pagination (Admin only)
+- `GET /api/admin/fitness-classes` - Get all fitness classes with filtering and pagination
   - Query parameters:
     - `page` - Page number (default: 1)
     - `limit` - Items per page (default: 10)
@@ -91,7 +91,7 @@ A Postman collection is included in the project root (`postman_collection.json`)
     - `instructorId` - Filter by instructor ID
     - `startDateFrom` - Filter classes starting after this date
     - `startDateTo` - Filter classes starting before this date
-- `POST /api/v1/fitness-classes` - Create a fitness class (Admin only)
+- `POST /api/admin/fitness-classes` - Create a fitness class
 
 ## Project Structure
 
@@ -102,6 +102,8 @@ src/
 ├── middlewares/    # Express middlewares
 ├── models/         # Database models
 ├── routes/         # API routes
+│   ├── v1/         # Regular versioned routes
+│   └── admin/      # Admin-only routes (no versioning)
 ├── schemas/        # Validation schemas
 ├── scripts/        # Utility scripts
 ├── services/       # Business logic

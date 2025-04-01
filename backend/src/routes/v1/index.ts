@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import healthRouter from './health.routes'
 import authRouter from './auth.routes'
-import fitnessClassRouter from './fitnessClass.routes'
 
 const v1Router = Router()
 
@@ -10,8 +9,5 @@ v1Router.use('/health', healthRouter)
 
 // Authentication routes
 v1Router.use('/auth', authRouter)
-
-// Fitness class routes
-v1Router.use('/fitness-classes', fitnessClassRouter)
 
 export default v1Router

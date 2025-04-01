@@ -138,108 +138,114 @@
       "description": "User authentication endpoints"
     },
     {
-      "name": "Fitness Classes",
+      "name": "Admin",
       "item": [
         {
-          "name": "Get All Fitness Classes",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{authToken}}",
-                  "type": "string"
-                }
-              ]
+          "name": "Fitness Classes",
+          "item": [
+            {
+              "name": "Get All Fitness Classes",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{authToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/fitness-classes?page=1&limit=10&name=yoga",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "admin", "fitness-classes"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number for pagination"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Number of items per page"
+                    },
+                    {
+                      "key": "name",
+                      "value": "yoga",
+                      "description": "Search by class name (optional)"
+                    },
+                    {
+                      "key": "categoryId",
+                      "value": "",
+                      "description": "Filter by category ID (optional)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "instructorId",
+                      "value": "",
+                      "description": "Filter by instructor ID (optional)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "startDateFrom",
+                      "value": "",
+                      "description": "Filter classes starting after this date (ISO format, optional)",
+                      "disabled": true
+                    },
+                    {
+                      "key": "startDateTo",
+                      "value": "",
+                      "description": "Filter classes starting before this date (ISO format, optional)",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Get a list of all fitness classes with filtering and pagination. Requires admin role. Returns a paginated result with fitness class data."
+              },
+              "response": []
             },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/fitness-classes?page=1&limit=10&name=yoga",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "fitness-classes"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1",
-                  "description": "Page number for pagination"
+            {
+              "name": "Create Fitness Class",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{authToken}}",
+                      "type": "string"
+                    }
+                  ]
                 },
-                {
-                  "key": "limit",
-                  "value": "10",
-                  "description": "Number of items per page"
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Yoga for Beginners\",\n    \"categoryId\": \"your-category-id\",\n    \"instructorId\": \"your-instructor-id\",\n    \"startsAt\": \"2024-07-15T10:00:00.000Z\",\n    \"endsAt\": \"2024-07-15T11:00:00.000Z\"\n}"
                 },
-                {
-                  "key": "name",
-                  "value": "yoga",
-                  "description": "Search by class name (optional)"
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/fitness-classes",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "admin", "fitness-classes"]
                 },
-                {
-                  "key": "categoryId",
-                  "value": "",
-                  "description": "Filter by category ID (optional)",
-                  "disabled": true
-                },
-                {
-                  "key": "instructorId",
-                  "value": "",
-                  "description": "Filter by instructor ID (optional)",
-                  "disabled": true
-                },
-                {
-                  "key": "startDateFrom",
-                  "value": "",
-                  "description": "Filter classes starting after this date (ISO format, optional)",
-                  "disabled": true
-                },
-                {
-                  "key": "startDateTo",
-                  "value": "",
-                  "description": "Filter classes starting before this date (ISO format, optional)",
-                  "disabled": true
-                }
-              ]
-            },
-            "description": "Get a list of all fitness classes with filtering and pagination. Requires admin role. Returns a paginated result with fitness class data."
-          },
-          "response": []
-        },
-        {
-          "name": "Create Fitness Class",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{authToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Yoga for Beginners\",\n    \"categoryId\": \"your-category-id\",\n    \"instructorId\": \"your-instructor-id\",\n    \"startsAt\": \"2024-07-15T10:00:00.000Z\",\n    \"endsAt\": \"2024-07-15T11:00:00.000Z\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/fitness-classes",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "fitness-classes"]
-            },
-            "description": "Create a new fitness class. Requires admin role. The start and end times must be valid ISO datetime strings, and the end time must be after the start time."
-          },
-          "response": []
+                "description": "Create a new fitness class. Requires admin role. The start and end times must be valid ISO datetime strings, and the end time must be after the start time."
+              },
+              "response": []
+            }
+          ],
+          "description": "Fitness class management endpoints"
         }
       ],
-      "description": "Fitness class management endpoints"
+      "description": "Admin-only endpoints"
     }
   ],
   "event": [

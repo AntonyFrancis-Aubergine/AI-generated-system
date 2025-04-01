@@ -1,33 +1,24 @@
 import { Router } from 'express'
 import { FitnessClassController } from '../../controllers'
 import { validate } from '../../middlewares/validations.middleware'
-import { authenticate, hasRole } from '../../middlewares/auth.middleware'
 import { FitnessClassSchema } from '../../schemas'
-import { CONSTANTS } from '../../utils/constants'
 
 const fitnessClassRouter = Router()
 
 /**
- * @route GET /api/v1/fitness-classes
+ * @route GET /api/admin/fitness-classes
  * @desc Get all fitness classes with filtering and pagination
- * @access Restricted to ADMIN
+ * @access Admin only
  */
-fitnessClassRouter.get(
-  '/',
-  authenticate,
-  hasRole([CONSTANTS.AUTH.ROLES.ADMIN]),
-  FitnessClassController.getAllFitnessClasses
-)
+fitnessClassRouter.get('/', FitnessClassController.getAllFitnessClasses)
 
 /**
- * @route POST /api/v1/fitness-classes
+ * @route POST /api/admin/fitness-classes
  * @desc Create a new fitness class
- * @access Restricted to ADMIN
+ * @access Admin only
  */
 fitnessClassRouter.post(
   '/',
-  authenticate,
-  hasRole([CONSTANTS.AUTH.ROLES.ADMIN]),
   validate(FitnessClassSchema.createFitnessClassSchema),
   FitnessClassController.createFitnessClass
 )
