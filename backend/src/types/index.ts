@@ -1,5 +1,6 @@
 export * as HealthTypes from './health.types'
 export * as AuthTypes from './auth.types'
+export * as FitnessClassTypes from './fitnessClass.types'
 
 export interface Pagination {
   page: number

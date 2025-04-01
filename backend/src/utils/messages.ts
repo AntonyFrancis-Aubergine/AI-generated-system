@@ -67,4 +67,12 @@ export const MESSAGES = {
     TOKEN_INVALID: 'Invalid authentication token',
     TOKEN_MISSING: 'Authentication token is missing',
   },
+
+  FITNESS_CLASS: {
+    CREATED: 'Fitness class created successfully',
+    UPDATED: 'Fitness class updated successfully',
+    DELETED: 'Fitness class deleted successfully',
+    INSTRUCTOR_CONFLICT: 'Instructor has a conflicting class at this time',
+    INVALID_TIME_RANGE: 'End time must be after start time',
+  },
 }
