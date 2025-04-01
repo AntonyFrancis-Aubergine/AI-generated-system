@@ -54,4 +54,17 @@ export const MESSAGES = {
     API_RUNNING: 'API is running',
     DATABASE_ERROR: 'Database connection error',
   },
+
+  AUTH: {
+    REGISTER_SUCCESS: 'User registered successfully',
+    LOGIN_SUCCESS: 'User logged in successfully',
+    INVALID_CREDENTIALS: 'Invalid email or password',
+    EMAIL_EXISTS: 'Email already exists',
+    UNAUTHORIZED: 'Unauthorized access',
+    FORBIDDEN: 'Access forbidden',
+    PASSWORD_WEAK:
+      'Password is too weak. It should be at least 8 characters and include uppercase, lowercase, numbers, and special characters',
+    TOKEN_INVALID: 'Invalid authentication token',
+    TOKEN_MISSING: 'Authentication token is missing',
+  },
 }

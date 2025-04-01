@@ -45,6 +45,8 @@ IMPLEMENTATION GUIDELINES
     - In route path parameters, use full name of the parameter and it should be in camelCase. Example: /api/v1/users/:userId
   - Controller in src/controllers/
   - Service in src/services/
+  - Types in src/types/
+  - Zod validation schemas for request body validation in src/schemas/
   - Model in src/models/ if needed
   - All directories in src will have index.ts file to export everything.
 - Store constants in src/utils/constants.ts

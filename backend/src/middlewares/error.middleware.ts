@@ -12,6 +12,7 @@ export const errorConverter = (
 ): void => {
   let err: APIError
 
+  console.log('Error : ', error)
   // TODO: Add more cases as needed
   switch (true) {
     case error.isOperational:
@@ -68,7 +69,7 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ): void => {
-  console.error(JSON.stringify(error, null, 2))
+  console.error(error)
 
   // if (error.message === MESSAGES.TOKEN_EXPIRED) {
   //   return res.status(error.status).json(
