@@ -1,6 +1,6 @@
 import prisma from '../config/db'
 import { Prisma, FitnessClassBooking } from '@prisma/client'
-import { Pagination } from '../types'
+import { Pagination, PaginatedResult } from '../types'
 import { APIError } from '../utils/customError'
 import { STATUS_CODES } from '../utils/statusCodes'
 import { MESSAGES } from '../utils/messages'
@@ -15,6 +15,15 @@ export const fetchFitnessClassBooking = async (
 ): Promise<FitnessClassBooking | null> => {
   const booking = await prisma.fitnessClassBooking.findFirst({
     where: bookingQuery,
+    include: {
+      user: true,
+      fitnessClass: {
+        include: {
+          category: true,
+          instructor: true,
+        },
+      },
+    },
   })
 
   return booking
@@ -24,46 +33,51 @@ export const fetchFitnessClassBooking = async (
  * Fetch multiple fitness class bookings with filters and pagination
  * @param bookingQuery Query to filter bookings
  * @param pagination Pagination parameters
- * @returns Array of fitness class bookings
+ * @returns Paginated result of fitness class bookings
  */
 export const fetchFitnessClassBookingsWithFiltersAndPagination = async (
   bookingQuery: Prisma.FitnessClassBookingWhereInput,
   pagination: Pagination
-): Promise<FitnessClassBooking[]> => {
+): Promise<PaginatedResult<FitnessClassBooking>> => {
   const { page, limit } = pagination
   const skip = (page - 1) * limit
+
+  // Get total count for pagination metadata
+  const totalItems = await prisma.fitnessClassBooking.count({
+    where: bookingQuery,
+  })
 
   const bookings = await prisma.fitnessClassBooking.findMany({
     where: bookingQuery,
     skip,
     take: limit,
     include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          mobile: true,
-        },
-      },
+      user: true,
       fitnessClass: {
         include: {
           category: true,
-          instructor: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              role: true,
-            },
-          },
+          instructor: true,
         },
       },
     },
   })
 
-  return bookings
+  // Calculate pagination metadata
+  const totalPages = Math.ceil(totalItems / limit)
+  const hasNextPage = page < totalPages
+  const hasPreviousPage = page > 1
+
+  return {
+    data: bookings,
+    meta: {
+      currentPage: page,
+      totalPages,
+      totalItems,
+      itemsPerPage: limit,
+      hasNextPage,
+      hasPreviousPage,
+    },
+  }
 }
 
 /**
@@ -127,26 +141,11 @@ export const createBooking = async (bookingData: {
       },
     },
     include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          mobile: true,
-        },
-      },
+      user: true,
       fitnessClass: {
         include: {
           category: true,
-          instructor: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              role: true,
-            },
-          },
+          instructor: true,
         },
       },
     },
@@ -182,26 +181,11 @@ export const updateBooking = async (
     where: { id: bookingId },
     data: bookingData,
     include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          mobile: true,
-        },
-      },
+      user: true,
       fitnessClass: {
         include: {
           category: true,
-          instructor: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              role: true,
-            },
-          },
+          instructor: true,
         },
       },
     },
@@ -237,12 +221,12 @@ export const deleteBooking = async (bookingId: string): Promise<void> => {
  * Get bookings for a specific user
  * @param userId ID of the user
  * @param pagination Pagination parameters
- * @returns Array of fitness class bookings
+ * @returns Paginated result of fitness class bookings
  */
 export const getUserBookings = async (
   userId: string,
   pagination: Pagination
-): Promise<FitnessClassBooking[]> => {
+): Promise<PaginatedResult<FitnessClassBooking>> => {
   const { page, limit } = pagination
   const skip = (page - 1) * limit
 
@@ -259,22 +243,21 @@ export const getUserBookings = async (
     )
   }
 
+  // Get total count for pagination metadata
+  const totalItems = await prisma.fitnessClassBooking.count({
+    where: { userId },
+  })
+
   const bookings = await prisma.fitnessClassBooking.findMany({
     where: { userId },
     skip,
     take: limit,
     include: {
+      user: true,
       fitnessClass: {
         include: {
           category: true,
-          instructor: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              role: true,
-            },
-          },
+          instructor: true,
         },
       },
     },
@@ -283,19 +266,34 @@ export const getUserBookings = async (
     },
   })
 
-  return bookings
+  // Calculate pagination metadata
+  const totalPages = Math.ceil(totalItems / limit)
+  const hasNextPage = page < totalPages
+  const hasPreviousPage = page > 1
+
+  return {
+    data: bookings,
+    meta: {
+      currentPage: page,
+      totalPages,
+      totalItems,
+      itemsPerPage: limit,
+      hasNextPage,
+      hasPreviousPage,
+    },
+  }
 }
 
 /**
  * Get bookings for a specific fitness class
  * @param fitnessClassId ID of the fitness class
  * @param pagination Pagination parameters
- * @returns Array of fitness class bookings
+ * @returns Paginated result of fitness class bookings
  */
 export const getClassBookings = async (
   fitnessClassId: string,
   pagination: Pagination
-): Promise<FitnessClassBooking[]> => {
+): Promise<PaginatedResult<FitnessClassBooking>> => {
   const { page, limit } = pagination
   const skip = (page - 1) * limit
 
@@ -312,18 +310,21 @@ export const getClassBookings = async (
     )
   }
 
+  // Get total count for pagination metadata
+  const totalItems = await prisma.fitnessClassBooking.count({
+    where: { fitnessClassId },
+  })
+
   const bookings = await prisma.fitnessClassBooking.findMany({
     where: { fitnessClassId },
     skip,
     take: limit,
     include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          mobile: true,
+      user: true,
+      fitnessClass: {
+        include: {
+          category: true,
+          instructor: true,
         },
       },
     },
@@ -332,5 +333,20 @@ export const getClassBookings = async (
     },
   })
 
-  return bookings
+  // Calculate pagination metadata
+  const totalPages = Math.ceil(totalItems / limit)
+  const hasNextPage = page < totalPages
+  const hasPreviousPage = page > 1
+
+  return {
+    data: bookings,
+    meta: {
+      currentPage: page,
+      totalPages,
+      totalItems,
+      itemsPerPage: limit,
+      hasNextPage,
+      hasPreviousPage,
+    },
+  }
 }
