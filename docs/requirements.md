@@ -46,7 +46,6 @@ The platform will enable users to create accounts, search for classes by various
   - Password (minimum 8 characters, with complexity requirements)
   - Full name
   - Contact number
-  - Optional profile information (fitness goals, experience level)
 
 #### 3.1.2 Authentication Methods
 
@@ -235,11 +234,8 @@ The platform will enable users to create accounts, search for classes by various
 
 ### 5.2 Security
 
-- Firebase Authentication for secure user management
 - HTTPS for all communications
 - Data encryption for sensitive information
-- Regular security audits and penetration testing
-- GDPR and data privacy compliance
 
 ### 5.3 Scalability
 
@@ -260,59 +256,3 @@ The platform will enable users to create accounts, search for classes by various
 - Accessible interface following WCAG guidelines
 - Intuitive navigation with minimal learning curve
 - Multi-language support (future enhancement)
-
-## 6. Technical Architecture
-
-### 6.1 Frontend
-
-- React/Next.js for component-based UI development
-- TypeScript for type safety
-- Tailwind CSS for styling
-- Redux for state management
-- PWA capabilities for mobile-like experience on web
-
-### 6.2 Backend
-
-- Node.js with Express for API development
-- TypeScript for type safety and maintainability
-- RESTful API design principles
-- JWT for authentication
-
-### 6.3 Database
-
-- Firebase Firestore for document-based storage
-- Optimized data structure for quick queries
-- Real-time database features for live updates
-
-### 6.4 Authentication
-
-- Firebase Authentication service
-- Role-based access control
-- Secure password policies
-- Multi-factor authentication (future enhancement)
-
-### 6.5 Hosting & Deployment
-
-- Containerized application using Docker
-- CI/CD pipeline for automated testing and deployment
-- Cloud hosting with auto-scaling capabilities
-
-## 7. Future Enhancements
-
-### 7.1 AI Integration Possibilities
-
-- AI-powered class recommendations based on user preferences and history
-- Predictive analytics for class popularity and scheduling optimization
-- Automated content generation for class descriptions
-- Smart scheduling based on instructor availability and demand patterns
-
-### 7.2 Additional Features
-
-- Integration with fitness tracking devices and apps
-- Virtual class streaming capabilities
-- Payment processing and subscription management
-- Loyalty program and referral system
-
----
-
-This document serves as a comprehensive blueprint for developers and stakeholders to implement and refine the fitness class booking platform. It will be updated as requirements evolve throughout the development process.
