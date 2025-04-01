@@ -50,4 +50,8 @@ export const MESSAGES = {
   RATE_LIMIT_EXCEEDED: 'You have exceeded your request limit',
 
   // * Add API specific messages here
+  HEALTH: {
+    API_RUNNING: 'API is running',
+    DATABASE_ERROR: 'Database connection error',
+  },
 }

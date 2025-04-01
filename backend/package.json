@@ -5,14 +5,14 @@
   "scripts": {
     "build": "tsc",
     "start": "node --env-file=.env dist/server.js",
-    "dev": "tsc --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node --env-file=.env src/server.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
     "@types/express": "^5.0.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   },
   "dependencies": {
