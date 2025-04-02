@@ -1,0 +1,15 @@
+cd Frontend
+npm install react-router-dom @tanstack/react-query axios zod react-hook-form @hookform/resolvers @radix-ui/react-icons
+npm install -D @types/react-router-dom
+npm install class-variance-authority clsx tailwind-merge lucide-react
+npm install -g concurrently
+chmod +x run-dev.sh
+
+cd backend
+npm install
+npx prisma generate
+npm run dev
+npm install cors
+npm install --save-dev @types/cors
+
+npm run dev 

@@ -1,0 +1,111 @@
+/* FitnessClassCard Component Styles */
+
+.class-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.card-content {
+  padding: 1.25rem;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Category badge colors */
+.category-yoga {
+  background-color: #f3e8ff;
+  color: #7e22ce;
+}
+
+.category-pilates {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.category-cardio {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.category-strength {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.category-hiit {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.category-zumba {
+  background-color: #fce7f3;
+  color: #be185d;
+}
+
+.category-default {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.booked-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.class-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.class-detail {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.detail-icon {
+  height: 1rem;
+  width: 1rem;
+  margin-right: 0.5rem;
+}
+
+.card-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.action-button {
+  width: 100%;
+}
+
+.action-button-half {
+  flex: 1;
+}
