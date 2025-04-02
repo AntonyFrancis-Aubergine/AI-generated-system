@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { FitnessClassController } from '../../controllers'
+import { FitnessClassController, BookingController } from '../../controllers'
 import { authenticate } from '../../middlewares/auth.middleware'
 
 const fitnessClassRouter = Router()
@@ -13,6 +13,17 @@ fitnessClassRouter.get(
   '/',
   authenticate,
   FitnessClassController.getAvailableFitnessClasses
+)
+
+/**
+ * @route POST /api/v1/fitness-classes/:fitnessClassId
+ * @desc Book a fitness class for the current logged-in user
+ * @access Authenticated users
+ */
+fitnessClassRouter.post(
+  '/:fitnessClassId',
+  authenticate,
+  BookingController.bookFitnessClass
 )
 
 export default fitnessClassRouter

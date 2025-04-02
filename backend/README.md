@@ -92,6 +92,9 @@ A Postman collection is included in the project root (`postman_collection.json`)
     - `instructorId` - Filter by instructor ID
     - `startDateFrom` - Filter classes starting after this date
     - `startDateTo` - Filter classes starting before this date
+- `POST /api/v1/fitness-classes/:fitnessClassId` - Book a fitness class
+  - Only allows booking classes that start more than 1 hour from now
+  - Uses authenticated user's ID for booking
 
 #### Admin Endpoints (All require ADMIN role)
 

@@ -75,4 +75,11 @@ export const MESSAGES = {
     INSTRUCTOR_CONFLICT: 'Instructor has a conflicting class at this time',
     INVALID_TIME_RANGE: 'End time must be after start time',
   },
+
+  BOOKING: {
+    CREATED: 'Fitness class booked successfully',
+    DELETED: 'Booking cancelled successfully',
+    EXISTS: 'You have already booked this fitness class',
+    CLASS_TOO_SOON: 'Cannot book a class that starts in less than 1 hour',
+  },
 }
