@@ -34,4 +34,14 @@ fitnessClassRouter.put(
   FitnessClassController.updateFitnessClass
 )
 
+/**
+ * @route DELETE /api/admin/fitness-classes/:fitnessClassId
+ * @desc Delete a fitness class
+ * @access Admin only
+ */
+fitnessClassRouter.delete(
+  '/:fitnessClassId',
+  FitnessClassController.deleteFitnessClass
+)
+
 export default fitnessClassRouter

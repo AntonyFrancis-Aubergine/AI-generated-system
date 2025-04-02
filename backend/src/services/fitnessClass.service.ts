@@ -254,9 +254,40 @@ export const updateFitnessClass = async (
   return fitnessClass
 }
 
+/**
+ * Delete a fitness class by ID
+ * @param fitnessClassId ID of the fitness class to delete
+ * @throws APIError if fitness class doesn't exist or has active bookings
+ */
 export const deleteFitnessClass = async (
   fitnessClassId: string
 ): Promise<void> => {
+  // Check if fitness class exists with bookings included
+  const fitnessClass = await prisma.fitnessClass.findUnique({
+    where: { id: fitnessClassId },
+    include: {
+      bookings: true,
+    },
+  })
+
+  if (!fitnessClass) {
+    throw new APIError(
+      STATUS_CODES.CLIENT_ERROR.NOT_FOUND,
+      MESSAGES.NOT_FOUND('Fitness class'),
+      true
+    )
+  }
+
+  // Check if there are any bookings for this class
+  if (fitnessClass.bookings && fitnessClass.bookings.length > 0) {
+    throw new APIError(
+      STATUS_CODES.CLIENT_ERROR.CONFLICT,
+      'Cannot delete a fitness class that has active bookings',
+      true
+    )
+  }
+
+  // Delete the fitness class
   await prisma.fitnessClass.delete({
     where: { id: fitnessClassId },
   })

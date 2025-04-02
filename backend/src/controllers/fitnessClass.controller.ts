@@ -6,6 +6,7 @@ import { APIResponse } from '../utils/responseGenerator'
 import { MESSAGES } from '../utils/messages'
 import { FitnessClassTypes, Pagination } from '../types'
 import { Prisma } from '@prisma/client'
+import { APIError } from '../utils/customError'
 
 /**
  * Create a new fitness class
@@ -283,5 +284,36 @@ export const getAvailableFitnessClasses = catchAsync(
         data: result,
       })
     )
+  }
+)
+
+/**
+ * Delete a fitness class
+ */
+export const deleteFitnessClass = catchAsync(
+  async (req: Request, res: Response) => {
+    // Get the fitness class ID from the request parameters
+    const { fitnessClassId } = req.params
+
+    try {
+      // Delete the fitness class (validation handled in service)
+      await FitnessClassService.deleteFitnessClass(fitnessClassId as string)
+
+      return res.status(STATUS_CODES.SUCCESS.OK).json(
+        APIResponse.sendSuccess({
+          message: MESSAGES.FITNESS_CLASS.DELETED,
+          data: null,
+        })
+      )
+    } catch (error: unknown) {
+      if (error instanceof APIError) {
+        return res.status(error.status).json(
+          APIResponse.sendError({
+            message: error.message,
+          })
+        )
+      }
+      throw error
+    }
   }
 )

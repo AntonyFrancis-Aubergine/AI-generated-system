@@ -429,6 +429,42 @@
                 "description": "Update an existing fitness class. Requires admin role. All fields are optional - only provided fields will be updated. If updating time or instructor, checks are performed to avoid scheduling conflicts."
               },
               "response": []
+            },
+            {
+              "name": "Delete Fitness Class",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{authToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/fitness-classes/:fitnessClassId",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "admin",
+                    "fitness-classes",
+                    ":fitnessClassId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "fitnessClassId",
+                      "value": "your-fitness-class-id",
+                      "description": "ID of the fitness class to delete"
+                    }
+                  ]
+                },
+                "description": "Delete a fitness class. Requires admin role. Cannot delete classes that have active bookings."
+              },
+              "response": []
             }
           ],
           "description": "Fitness class management endpoints"

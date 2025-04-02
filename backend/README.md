@@ -126,6 +126,9 @@ A Postman collection is included in the project root (`postman_collection.json`)
     - `instructorId` - Instructor ID (optional)
     - `startsAt` - Start time of the class (ISO format, optional)
     - `endsAt` - End time of the class (ISO format, optional)
+- `DELETE /api/admin/fitness-classes/:fitnessClassId` - Delete a fitness class
+  - Cannot delete classes that have active bookings
+  - Returns a success message when deletion is successful
 
 ## Project Structure
 
