@@ -74,6 +74,8 @@ export const MESSAGES = {
     DELETED: 'Fitness class deleted successfully',
     INSTRUCTOR_CONFLICT: 'Instructor has a conflicting class at this time',
     INVALID_TIME_RANGE: 'End time must be after start time',
+    INVALID_INSTRUCTOR_ROLE:
+      'The selected user does not have an instructor role',
   },
 
   BOOKING: {

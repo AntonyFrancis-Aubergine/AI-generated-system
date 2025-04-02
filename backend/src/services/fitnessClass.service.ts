@@ -121,7 +121,7 @@ export const checkInstructorConflicts = async (
 export const createFitnessClass = async (
   fitnessClassData: FitnessClassTypes.CreateFitnessClassRequest
 ): Promise<FitnessClass> => {
-  // Check if instructor exists
+  // Check if instructor exists and has INSTRUCTOR role
   const instructor = await prisma.user.findUnique({
     where: { id: fitnessClassData.instructorId },
   })
@@ -130,6 +130,15 @@ export const createFitnessClass = async (
     throw new APIError(
       STATUS_CODES.CLIENT_ERROR.NOT_FOUND,
       MESSAGES.NOT_FOUND('Instructor'),
+      true
+    )
+  }
+
+  // Verify instructor has INSTRUCTOR role
+  if (instructor.role !== 'INSTRUCTOR') {
+    throw new APIError(
+      STATUS_CODES.CLIENT_ERROR.BAD_REQUEST,
+      MESSAGES.FITNESS_CLASS.INVALID_INSTRUCTOR_ROLE,
       true
     )
   }
@@ -219,6 +228,15 @@ export const updateFitnessClass = async (
       throw new APIError(
         STATUS_CODES.CLIENT_ERROR.NOT_FOUND,
         MESSAGES.NOT_FOUND('Instructor'),
+        true
+      )
+    }
+
+    // Verify instructor has INSTRUCTOR role
+    if (instructor.role !== 'INSTRUCTOR') {
+      throw new APIError(
+        STATUS_CODES.CLIENT_ERROR.BAD_REQUEST,
+        MESSAGES.FITNESS_CLASS.INVALID_INSTRUCTOR_ROLE,
         true
       )
     }

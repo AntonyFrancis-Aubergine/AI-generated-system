@@ -47,7 +47,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "auth", "register"]
             },
-            "description": "Register a new user in the system. Returns the created user without password."
+            "description": "Register a new user in the system. Only USER and INSTRUCTOR roles are allowed for public registration. Returns the created user without password."
           },
           "response": []
         },
@@ -70,30 +70,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "auth", "register"]
             },
-            "description": "Register a new instructor in the system. Returns the created user without password."
-          },
-          "response": []
-        },
-        {
-          "name": "Register Admin",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Admin User\",\n    \"email\": \"admin@example.com\",\n    \"password\": \"Password123!\",\n    \"role\": \"ADMIN\",\n    \"mobile\": \"5555555555\",\n    \"address\": \"789 Admin St, City\",\n    \"dob\": \"1980-12-25\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "auth", "register"]
-            },
-            "description": "Register a new admin in the system. Returns the created user without password."
+            "description": "Register a new instructor in the system. Only USER and INSTRUCTOR roles are allowed for public registration. Returns the created user without password."
           },
           "response": []
         },

@@ -78,6 +78,8 @@ A Postman collection is included in the project root (`postman_collection.json`)
 #### Authentication
 
 - `POST /api/v1/auth/register` - Register a new user
+  - Only USER and INSTRUCTOR roles are allowed for public registration
+  - ADMIN accounts cannot be created through public registration
 - `POST /api/v1/auth/login` - Login a user
 
 #### Fitness Classes (User)
