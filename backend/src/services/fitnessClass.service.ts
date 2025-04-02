@@ -62,24 +62,24 @@ export const fetchFitnessClassesWithFiltersAndPagination = async (
 }
 
 /**
- * Check if an instructor has any conflicting classes during the specified time range
+ * Check if an instructor has time conflicts with existing classes
  * @param instructorId ID of the instructor
  * @param startsAt Start time of the class
  * @param endsAt End time of the class
- * @param excludeClassId Optional class ID to exclude from the check (useful for updates)
- * @returns true if conflicts exist, false otherwise
+ * @param excludeClassId Optional ID of a class to exclude from conflict check (for updates)
+ * @returns Boolean indicating if conflicts exist
  */
 export const checkInstructorConflicts = async (
   instructorId: string,
-  startsAt: Date | string,
-  endsAt: Date | string,
+  startsAt: string,
+  endsAt: string,
   excludeClassId?: string
 ): Promise<boolean> => {
   const startDate = new Date(startsAt)
   const endDate = new Date(endsAt)
 
-  // Query to find any overlapping classes
-  const whereCondition: Prisma.FitnessClassWhereInput = {
+  // Build where clause to find overlapping classes
+  const whereClause: Prisma.FitnessClassWhereInput = {
     instructorId,
     OR: [
       // Case 1: New class starts during an existing class
@@ -100,16 +100,17 @@ export const checkInstructorConflicts = async (
     ],
   }
 
-  // Add exclusion condition if provided
+  // Exclude the class being updated if an ID is provided
   if (excludeClassId) {
-    whereCondition.NOT = { id: excludeClassId }
+    whereClause.id = { not: excludeClassId }
   }
 
-  const conflictingClasses = await prisma.fitnessClass.findMany({
-    where: whereCondition,
+  // Count overlapping classes
+  const conflictCount = await prisma.fitnessClass.count({
+    where: whereClause,
   })
 
-  return conflictingClasses.length > 0
+  return conflictCount > 0
 }
 
 /**
@@ -183,10 +184,63 @@ export const createFitnessClass = async (
   return fitnessClass
 }
 
+/**
+ * Update a fitness class by ID
+ * @param fitnessClassId ID of the fitness class to update
+ * @param fitnessClassData Data to update
+ * @returns Updated fitness class
+ */
 export const updateFitnessClass = async (
   fitnessClassId: string,
   fitnessClassData: Prisma.FitnessClassUpdateInput
 ): Promise<FitnessClass> => {
+  // Check if fitness class exists
+  const existingClass = await prisma.fitnessClass.findUnique({
+    where: { id: fitnessClassId },
+  })
+
+  if (!existingClass) {
+    throw new APIError(
+      STATUS_CODES.CLIENT_ERROR.NOT_FOUND,
+      MESSAGES.NOT_FOUND('Fitness class'),
+      true
+    )
+  }
+
+  // Handle instructor check if provided
+  if (fitnessClassData.instructor && 'connect' in fitnessClassData.instructor) {
+    const instructorId = (fitnessClassData.instructor.connect as { id: string })
+      .id
+    const instructor = await prisma.user.findUnique({
+      where: { id: instructorId },
+    })
+
+    if (!instructor) {
+      throw new APIError(
+        STATUS_CODES.CLIENT_ERROR.NOT_FOUND,
+        MESSAGES.NOT_FOUND('Instructor'),
+        true
+      )
+    }
+  }
+
+  // Handle category check if provided
+  if (fitnessClassData.category && 'connect' in fitnessClassData.category) {
+    const categoryId = (fitnessClassData.category.connect as { id: string }).id
+    const category = await prisma.fitnessClassCategory.findUnique({
+      where: { id: categoryId },
+    })
+
+    if (!category) {
+      throw new APIError(
+        STATUS_CODES.CLIENT_ERROR.NOT_FOUND,
+        MESSAGES.NOT_FOUND('Category'),
+        true
+      )
+    }
+  }
+
+  // Update the fitness class
   const fitnessClass = await prisma.fitnessClass.update({
     where: { id: fitnessClassId },
     data: fitnessClassData,

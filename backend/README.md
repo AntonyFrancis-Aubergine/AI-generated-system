@@ -117,6 +117,15 @@ A Postman collection is included in the project root (`postman_collection.json`)
     - `startDateFrom` - Filter classes starting after this date
     - `startDateTo` - Filter classes starting before this date
 - `POST /api/admin/fitness-classes` - Create a fitness class
+- `PUT /api/admin/fitness-classes/:fitnessClassId` - Update a fitness class
+  - All fields are optional - only provided fields will be updated
+  - If updating time or instructor, checks for scheduling conflicts
+  - Request body parameters:
+    - `name` - Class name (optional)
+    - `categoryId` - Category ID (optional)
+    - `instructorId` - Instructor ID (optional)
+    - `startsAt` - Start time of the class (ISO format, optional)
+    - `endsAt` - End time of the class (ISO format, optional)
 
 ## Project Structure
 

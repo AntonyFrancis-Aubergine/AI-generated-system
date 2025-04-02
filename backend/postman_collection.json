@@ -384,6 +384,51 @@
                 "description": "Create a new fitness class. Requires admin role. The start and end times must be valid ISO datetime strings, and the end time must be after the start time."
               },
               "response": []
+            },
+            {
+              "name": "Update Fitness Class",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{authToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Yoga Class\",\n    \"categoryId\": \"your-category-id\",\n    \"instructorId\": \"your-instructor-id\",\n    \"startsAt\": \"2024-07-15T11:00:00.000Z\",\n    \"endsAt\": \"2024-07-15T12:00:00.000Z\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/fitness-classes/:fitnessClassId",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "admin",
+                    "fitness-classes",
+                    ":fitnessClassId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "fitnessClassId",
+                      "value": "your-fitness-class-id",
+                      "description": "ID of the fitness class to update"
+                    }
+                  ]
+                },
+                "description": "Update an existing fitness class. Requires admin role. All fields are optional - only provided fields will be updated. If updating time or instructor, checks are performed to avoid scheduling conflicts."
+              },
+              "response": []
             }
           ],
           "description": "Fitness class management endpoints"

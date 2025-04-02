@@ -29,6 +29,111 @@ export const createFitnessClass = catchAsync(
 )
 
 /**
+ * Update an existing fitness class
+ */
+export const updateFitnessClass = catchAsync(
+  async (req: Request, res: Response) => {
+    // Get the fitness class ID from the request parameters
+    const { fitnessClassId } = req.params
+
+    // Get the update data from the request body
+    const updateData =
+      req.body as Partial<FitnessClassTypes.CreateFitnessClassRequest>
+
+    // Format data for Prisma update
+    const formattedData: Prisma.FitnessClassUpdateInput = {}
+
+    // Add basic fields
+    if (updateData.name) {
+      formattedData.name = updateData.name
+    }
+
+    // Format dates if provided
+    if (updateData.startsAt) {
+      formattedData.startsAt = new Date(updateData.startsAt)
+    }
+
+    if (updateData.endsAt) {
+      formattedData.endsAt = new Date(updateData.endsAt)
+    }
+
+    // Set up relations
+    if (updateData.categoryId) {
+      formattedData.category = {
+        connect: { id: updateData.categoryId },
+      }
+    }
+
+    if (updateData.instructorId) {
+      formattedData.instructor = {
+        connect: { id: updateData.instructorId },
+      }
+    }
+
+    // Check for instructor conflicts if instructor or time is being changed
+    if (
+      (updateData.instructorId || updateData.startsAt || updateData.endsAt) &&
+      (updateData.startsAt || updateData.endsAt)
+    ) {
+      const existingClass = await FitnessClassService.fetchFitnessClass({
+        id: fitnessClassId as string,
+      })
+
+      if (!existingClass) {
+        return res.status(STATUS_CODES.CLIENT_ERROR.NOT_FOUND).json(
+          APIResponse.sendError({
+            message: MESSAGES.NOT_FOUND('Fitness class'),
+          })
+        )
+      }
+
+      // Get instructor ID (either the updated one or the existing one)
+      const instructorId = updateData.instructorId || existingClass.instructorId
+
+      // Get start and end times (either the updated ones or the existing ones)
+      const startsAt =
+        updateData.startsAt || existingClass.startsAt.toISOString()
+      const endsAt = updateData.endsAt || existingClass.endsAt.toISOString()
+
+      // Only check conflicts if time or instructor is changing
+      if (
+        instructorId !== existingClass.instructorId ||
+        startsAt !== existingClass.startsAt.toISOString() ||
+        endsAt !== existingClass.endsAt.toISOString()
+      ) {
+        const hasConflicts = await FitnessClassService.checkInstructorConflicts(
+          instructorId,
+          startsAt,
+          endsAt,
+          fitnessClassId as string // Exclude current class from conflict check
+        )
+
+        if (hasConflicts) {
+          return res.status(STATUS_CODES.CLIENT_ERROR.CONFLICT).json(
+            APIResponse.sendError({
+              message: MESSAGES.FITNESS_CLASS.INSTRUCTOR_CONFLICT,
+            })
+          )
+        }
+      }
+    }
+
+    // Update the fitness class
+    const updatedFitnessClass = await FitnessClassService.updateFitnessClass(
+      fitnessClassId as string,
+      formattedData
+    )
+
+    return res.status(STATUS_CODES.SUCCESS.OK).json(
+      APIResponse.sendSuccess({
+        message: MESSAGES.FITNESS_CLASS.UPDATED,
+        data: updatedFitnessClass,
+      })
+    )
+  }
+)
+
+/**
  * Get all fitness classes with filtering and pagination
  */
 export const getAllFitnessClasses = catchAsync(

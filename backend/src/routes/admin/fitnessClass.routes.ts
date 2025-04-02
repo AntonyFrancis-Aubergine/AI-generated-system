@@ -23,4 +23,15 @@ fitnessClassRouter.post(
   FitnessClassController.createFitnessClass
 )
 
+/**
+ * @route PUT /api/admin/fitness-classes/:fitnessClassId
+ * @desc Update an existing fitness class
+ * @access Admin only
+ */
+fitnessClassRouter.put(
+  '/:fitnessClassId',
+  validate(FitnessClassSchema.updateFitnessClassSchema),
+  FitnessClassController.updateFitnessClass
+)
+
 export default fitnessClassRouter
