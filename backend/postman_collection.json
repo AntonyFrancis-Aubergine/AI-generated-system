@@ -240,6 +240,48 @@
       "description": "Endpoints for users to interact with fitness classes"
     },
     {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Get User Bookings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/bookings?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "bookings"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Get a list of the current user's fitness class bookings with pagination. Requires authentication. Returns a paginated result with booking data including fitness class details."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for users to manage their bookings"
+    },
+    {
       "name": "Admin",
       "item": [
         {

@@ -96,6 +96,15 @@ A Postman collection is included in the project root (`postman_collection.json`)
   - Only allows booking classes that start more than 1 hour from now
   - Uses authenticated user's ID for booking
 
+#### User Bookings
+
+- `GET /api/v1/bookings` - Get all bookings for the authenticated user with pagination
+  - Requires authentication
+  - Returns fitness class details with each booking
+  - Query parameters:
+    - `page` - Page number (default: 1)
+    - `limit` - Items per page (default: 10)
+
 #### Admin Endpoints (All require ADMIN role)
 
 - `GET /api/admin/fitness-classes` - Get all fitness classes with filtering and pagination

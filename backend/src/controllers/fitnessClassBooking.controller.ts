@@ -4,6 +4,7 @@ import { FitnessClassBookingService, FitnessClassService } from '../services'
 import { STATUS_CODES } from '../utils/statusCodes'
 import { APIResponse } from '../utils/responseGenerator'
 import { MESSAGES } from '../utils/messages'
+import { Pagination } from '../types'
 
 /**
  * Book a fitness class for the currently logged-in user
@@ -60,6 +61,48 @@ export const bookFitnessClass = catchAsync(
       APIResponse.sendSuccess({
         message: MESSAGES.BOOKING.CREATED,
         data: booking,
+      })
+    )
+  }
+)
+
+/**
+ * Get all bookings for the currently logged-in user with pagination and filtering
+ */
+export const getUserBookings = catchAsync(
+  async (req: Request, res: Response) => {
+    // Get the current user's ID from the authenticated request
+    const userId = req.user?.userId
+
+    if (!userId) {
+      return res.status(STATUS_CODES.CLIENT_ERROR.UNAUTHORIZED).json(
+        APIResponse.sendError({
+          message: MESSAGES.AUTH.UNAUTHORIZED,
+        })
+      )
+    }
+
+    // Parse pagination parameters with defaults
+    const pagination: Pagination = {
+      page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
+      limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
+    }
+
+    // Ensure pagination parameters are valid
+    if (pagination.page < 1) pagination.page = 1
+    if (pagination.limit < 1) pagination.limit = 10
+    if (pagination.limit > 100) pagination.limit = 100
+
+    // Get bookings for the user with pagination
+    const result = await FitnessClassBookingService.getUserBookings(
+      userId,
+      pagination
+    )
+
+    return res.status(STATUS_CODES.SUCCESS.OK).json(
+      APIResponse.sendSuccess({
+        message: MESSAGES.RETRIEVE_SUCCESS('User bookings'),
+        data: result,
       })
     )
   }
