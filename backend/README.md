@@ -88,6 +88,7 @@ A Postman collection is included in the project root (`postman_collection.json`)
 
 - `GET /api/v1/fitness-classes` - Get available fitness classes with filtering and pagination
   - Only shows classes that start more than 1 hour from now
+  - Excludes classes already booked by the current user
   - Query parameters:
     - `page` - Page number (default: 1)
     - `limit` - Items per page (default: 10)

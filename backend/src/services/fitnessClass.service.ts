@@ -350,3 +350,70 @@ export const fetchFitnessClassCategories = async (
     },
   }
 }
+
+/**
+ * Fetch available fitness classes with filters and pagination
+ * Excludes fitness classes that are already booked by the current user
+ * @param fitnessClassQuery Fitness class query filters
+ * @param pagination Pagination parameters
+ * @param userId ID of the current user
+ * @returns Paginated result of available fitness classes
+ */
+export const fetchAvailableFitnessClasses = async (
+  fitnessClassQuery: Prisma.FitnessClassWhereInput,
+  pagination: Pagination,
+  userId: string
+): Promise<PaginatedResult<FitnessClass>> => {
+  const { page, limit } = pagination
+  const skip = (page - 1) * limit
+
+  // Find the IDs of fitness classes that the user has already booked
+  const userBookings = await prisma.fitnessClassBooking.findMany({
+    where: { userId },
+    select: { fitnessClassId: true },
+  })
+
+  const bookedClassIds = userBookings.map((booking) => booking.fitnessClassId)
+
+  // Add the filter to exclude already booked classes
+  const completeQuery: Prisma.FitnessClassWhereInput = {
+    ...fitnessClassQuery,
+    // Exclude classes that are in the bookedClassIds array
+    ...(bookedClassIds.length > 0 && {
+      id: { notIn: bookedClassIds },
+    }),
+  }
+
+  // Get total count for pagination metadata
+  const totalItems = await prisma.fitnessClass.count({
+    where: completeQuery,
+  })
+
+  const fitnessClasses = await prisma.fitnessClass.findMany({
+    where: completeQuery,
+    skip,
+    take: limit,
+    include: {
+      category: true,
+      instructor: true,
+      bookings: true,
+    },
+  })
+
+  // Calculate pagination metadata
+  const totalPages = Math.ceil(totalItems / limit)
+  const hasNextPage = page < totalPages
+  const hasPreviousPage = page > 1
+
+  return {
+    data: fitnessClasses,
+    meta: {
+      currentPage: page,
+      totalPages,
+      totalItems,
+      itemsPerPage: limit,
+      hasNextPage,
+      hasPreviousPage,
+    },
+  }
+}

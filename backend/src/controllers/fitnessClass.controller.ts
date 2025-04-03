@@ -205,10 +205,12 @@ export const getAllFitnessClasses = catchAsync(
 /**
  * Get available fitness classes for users
  * Only shows upcoming classes that have more than 1 hour to start
+ * Excludes classes already booked by the current user
  */
 export const getAvailableFitnessClasses = catchAsync(
   async (req: Request, res: Response) => {
     const query = req.query as FitnessClassTypes.FitnessClassQueryParams
+    const userId = req.user?.userId
 
     // Current time
     const now = new Date()
@@ -271,12 +273,12 @@ export const getAvailableFitnessClasses = catchAsync(
     if (pagination.limit < 1) pagination.limit = 10
     if (pagination.limit > 100) pagination.limit = 100
 
-    // Get fitness classes with filters and pagination
-    const result =
-      await FitnessClassService.fetchFitnessClassesWithFiltersAndPagination(
-        filterConditions,
-        pagination
-      )
+    // Get fitness classes with filters and pagination, excluding already booked classes
+    const result = await FitnessClassService.fetchAvailableFitnessClasses(
+      filterConditions,
+      pagination,
+      userId as string
+    )
 
     return res.status(STATUS_CODES.SUCCESS.OK).json(
       APIResponse.sendSuccess({
