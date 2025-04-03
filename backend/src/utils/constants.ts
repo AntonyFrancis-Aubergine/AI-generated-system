@@ -18,4 +18,10 @@ export const CONSTANTS = {
       ADMIN: 'ADMIN',
     },
   },
+  CORS: {
+    ALLOWED_ORIGINS: process.env.CORS_ORIGIN?.split(',') || ['*'],
+    METHODS: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    ALLOWED_HEADERS: ['Content-Type', 'Authorization'],
+    MAX_AGE: 86400, // 24 hours in seconds
+  },
 }

@@ -8,6 +8,7 @@ A RESTful API for managing fitness class bookings, built with Node.js, TypeScrip
 - Fitness class management
 - Booking management
 - Role-based access control (User, Instructor, Admin)
+- CORS support for cross-origin requests from frontend applications
 
 ## Tech Stack
 
@@ -33,6 +34,7 @@ Create a `.env` file in the root directory with the following variables:
 DATABASE_URL="postgresql://username:password@localhost:5432/fitness_booking_db"
 PORT=3000
 JWT_SECRET="your-secret-key"
+CORS_ORIGIN="http://localhost:3000,https://yourfrontend.com"  # Comma-separated origins, or use * for all origins
 ```
 
 ### Installation
