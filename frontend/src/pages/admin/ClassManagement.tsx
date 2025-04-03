@@ -35,12 +35,15 @@ import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { adminService } from '../../services/api'
+import { adminService, categoryService, userService } from '../../services/api'
 import {
+  Category,
   CreateFitnessClassRequest,
   FitnessClass,
   FitnessClassFilters,
   UpdateFitnessClassRequest,
+  User,
+  UserRole,
 } from '../../types'
 
 // Form validation schema
@@ -66,7 +69,11 @@ type FitnessClassFormData = z.infer<typeof fitnessClassSchema>
 
 const ClassManagement = () => {
   const [classes, setClasses] = useState<FitnessClass[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [instructors, setInstructors] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true)
+  const [isInstructorsLoading, setIsInstructorsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState<FitnessClassFilters>({
     page: 1,
@@ -98,6 +105,64 @@ const ClassManagement = () => {
     resolver: zodResolver(fitnessClassSchema),
   })
 
+  const fetchCategories = async () => {
+    try {
+      setIsCategoriesLoading(true)
+      const response = await categoryService.getCategories()
+      if (response.success) {
+        setCategories(response.data.data)
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch categories',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+    } catch (err) {
+      console.error('Failed to fetch categories:', err)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch categories',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsCategoriesLoading(false)
+    }
+  }
+
+  const fetchInstructors = async () => {
+    try {
+      setIsInstructorsLoading(true)
+      const response = await userService.getInstructors()
+      if (response.success) {
+        setInstructors(response.data)
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch instructors',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+    } catch (err) {
+      console.error('Failed to fetch instructors:', err)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch instructors',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsInstructorsLoading(false)
+    }
+  }
+
   const fetchClasses = async () => {
     try {
       setIsLoading(true)
@@ -118,6 +183,11 @@ const ClassManagement = () => {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchCategories()
+    fetchInstructors()
+  }, [])
 
   useEffect(() => {
     fetchClasses()
@@ -412,16 +482,23 @@ const ClassManagement = () => {
                     <Select
                       placeholder="Select category"
                       {...register('categoryId')}
+                      isDisabled={isCategoriesLoading}
                     >
-                      {/* Categories would be populated dynamically */}
-                      <option value="category1">Yoga</option>
-                      <option value="category2">Pilates</option>
-                      <option value="category3">Cardio</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
                     </Select>
                     {errors.categoryId && (
                       <FormErrorMessage>
                         {errors.categoryId.message}
                       </FormErrorMessage>
+                    )}
+                    {isCategoriesLoading && (
+                      <Text fontSize="sm" color="gray.500" mt={1}>
+                        Loading categories...
+                      </Text>
                     )}
                   </FormControl>
 
@@ -430,15 +507,23 @@ const ClassManagement = () => {
                     <Select
                       placeholder="Select instructor"
                       {...register('instructorId')}
+                      isDisabled={isInstructorsLoading}
                     >
-                      {/* Instructors would be populated dynamically */}
-                      <option value="instructor1">John Doe</option>
-                      <option value="instructor2">Jane Smith</option>
+                      {instructors.map((instructor) => (
+                        <option key={instructor.id} value={instructor.id}>
+                          {instructor.name}
+                        </option>
+                      ))}
                     </Select>
                     {errors.instructorId && (
                       <FormErrorMessage>
                         {errors.instructorId.message}
                       </FormErrorMessage>
+                    )}
+                    {isInstructorsLoading && (
+                      <Text fontSize="sm" color="gray.500" mt={1}>
+                        Loading instructors...
+                      </Text>
                     )}
                   </FormControl>
 

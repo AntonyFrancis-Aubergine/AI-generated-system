@@ -3,6 +3,7 @@ import {
   ApiResponse,
   AuthResponse,
   Booking,
+  Category,
   CreateFitnessClassRequest,
   FitnessClass,
   FitnessClassFilters,
@@ -49,6 +50,19 @@ export const authService = {
   },
 }
 
+// User Services
+export const userService = {
+  getUserProfile: async (userId: string): Promise<ApiResponse<User>> => {
+    const response = await api.get<ApiResponse<User>>(`/users/${userId}`)
+    return response.data
+  },
+
+  getInstructors: async (): Promise<ApiResponse<User[]>> => {
+    const response = await api.get<ApiResponse<User[]>>('/users/instructors')
+    return response.data
+  },
+}
+
 // Fitness Class Services (User)
 export const fitnessClassService = {
   getClasses: async (
@@ -62,9 +76,34 @@ export const fitnessClassService = {
     return response.data
   },
 
+  getClassById: async (
+    fitnessClassId: string
+  ): Promise<ApiResponse<FitnessClass>> => {
+    const response = await api.get<ApiResponse<FitnessClass>>(
+      `/fitness-classes/${fitnessClassId}`
+    )
+    return response.data
+  },
+
   bookClass: async (fitnessClassId: string): Promise<ApiResponse<Booking>> => {
     const response = await api.post<ApiResponse<Booking>>(
       `/fitness-classes/${fitnessClassId}`
+    )
+    return response.data
+  },
+}
+
+// Category Services
+export const categoryService = {
+  getCategories: async (
+    page = 1,
+    limit = 100
+  ): Promise<ApiResponse<PaginatedResponse<Category>>> => {
+    const response = await api.get<ApiResponse<PaginatedResponse<Category>>>(
+      '/categories',
+      {
+        params: { page, limit },
+      }
     )
     return response.data
   },

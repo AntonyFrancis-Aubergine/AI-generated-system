@@ -12,6 +12,7 @@ import AuthLayout from './layouts/AuthLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import theme from './utils/theme'
 import Loading from './components/Loading'
+import ClassDetails from './pages/user/ClassDetails'
 
 // Auth pages
 const Login = lazy(() => import('./pages/auth/Login'))
@@ -20,6 +21,7 @@ const Register = lazy(() => import('./pages/auth/Register'))
 // User pages
 const ClassList = lazy(() => import('./pages/user/ClassList'))
 const BookingList = lazy(() => import('./pages/user/BookingList'))
+const UserProfile = lazy(() => import('./pages/user/UserProfile'))
 
 // Admin pages
 const AdminClassManagement = lazy(() => import('./pages/admin/ClassManagement'))
@@ -49,7 +51,9 @@ function App() {
 
                   {/* User routes */}
                   <Route path="/classes" element={<ClassList />} />
-                  <Route path="/bookings" element={<BookingList />} />
+                  <Route path="/classes/:classId" element={<ClassDetails />} />
+                  <Route path="/my-bookings" element={<BookingList />} />
+                  <Route path="/profile" element={<UserProfile />} />
 
                   {/* Admin routes */}
                   <Route

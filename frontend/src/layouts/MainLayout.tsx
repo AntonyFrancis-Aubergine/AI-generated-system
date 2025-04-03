@@ -38,7 +38,7 @@ const getNavItems = (role: UserRole | undefined) => {
       return [
         ...commonItems,
         { label: 'Browse Classes', to: '/classes' },
-        { label: 'My Bookings', to: '/bookings' },
+        { label: 'My Bookings', to: '/my-bookings' },
       ]
     default:
       return commonItems

@@ -25,12 +25,15 @@ import {
 } from '@chakra-ui/react'
 import { SearchIcon } from '@chakra-ui/icons'
 import { format } from 'date-fns'
-import { fitnessClassService } from '../../services/api'
-import { FitnessClass, FitnessClassFilters } from '../../types'
+import { fitnessClassService, categoryService } from '../../services/api'
+import { FitnessClass, FitnessClassFilters, Category } from '../../types'
+import { useNavigate } from 'react-router-dom'
 
 const ClassList = () => {
   const [classes, setClasses] = useState<FitnessClass[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState<FitnessClassFilters>({
     page: 1,
@@ -42,6 +45,21 @@ const ClassList = () => {
     null
   )
   const toast = useToast()
+  const navigate = useNavigate()
+
+  const fetchCategories = async () => {
+    try {
+      setIsCategoriesLoading(true)
+      const response = await categoryService.getCategories()
+      if (response.success) {
+        setCategories(response.data.data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch categories:', err)
+    } finally {
+      setIsCategoriesLoading(false)
+    }
+  }
 
   const fetchClasses = async () => {
     try {
@@ -63,6 +81,10 @@ const ClassList = () => {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
 
   useEffect(() => {
     fetchClasses()
@@ -111,6 +133,10 @@ const ClassList = () => {
     } finally {
       setBookingInProgress(null)
     }
+  }
+
+  const handleViewDetails = (classId: string) => {
+    navigate(`/classes/${classId}`)
   }
 
   const formatDateTime = (dateString: string) => {
@@ -164,11 +190,13 @@ const ClassList = () => {
                     categoryId: e.target.value || undefined,
                   }))
                 }
+                isDisabled={isCategoriesLoading}
               >
-                {/* Categories would be populated dynamically */}
-                <option value="category1">Yoga</option>
-                <option value="category2">Pilates</option>
-                <option value="category3">Cardio</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
               </Select>
             </FormControl>
 
@@ -263,14 +291,22 @@ const ClassList = () => {
                 <Divider />
 
                 <CardFooter>
-                  <Button
-                    colorScheme="teal"
-                    isFullWidth
-                    onClick={() => handleBookClass(fitnessClass.id)}
-                    isLoading={bookingInProgress === fitnessClass.id}
-                  >
-                    Book Now
-                  </Button>
+                  <Stack spacing={2} width="100%">
+                    <Button
+                      colorScheme="teal"
+                      onClick={() => handleBookClass(fitnessClass.id)}
+                      isLoading={bookingInProgress === fitnessClass.id}
+                    >
+                      Book Now
+                    </Button>
+                    <Button
+                      variant="outline"
+                      colorScheme="teal"
+                      onClick={() => handleViewDetails(fitnessClass.id)}
+                    >
+                      View Details
+                    </Button>
+                  </Stack>
                 </CardFooter>
               </Card>
             ))}

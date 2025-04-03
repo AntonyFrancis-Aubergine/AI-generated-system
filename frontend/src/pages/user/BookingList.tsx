@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Button,
@@ -15,12 +16,14 @@ import {
   Td,
   Badge,
   Spinner,
+  Link,
 } from '@chakra-ui/react'
 import { format } from 'date-fns'
 import { bookingService } from '../../services/api'
 import { Booking } from '../../types'
 
 const BookingList = () => {
+  const navigate = useNavigate()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -67,6 +70,10 @@ const BookingList = () => {
     return new Date(endsAt) < new Date()
   }
 
+  const handleViewDetails = (classId: string) => {
+    navigate(`/classes/${classId}`)
+  }
+
   return (
     <Container maxW="container.xl">
       <Stack spacing={8}>
@@ -97,7 +104,7 @@ const BookingList = () => {
             <Button
               colorScheme="teal"
               mt={4}
-              onClick={() => (window.location.href = '/classes')}
+              onClick={() => navigate('/classes')}
             >
               Browse Classes
             </Button>
@@ -112,6 +119,7 @@ const BookingList = () => {
                   <Th>Instructor</Th>
                   <Th>Date & Time</Th>
                   <Th>Status</Th>
+                  <Th>Actions</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -145,6 +153,20 @@ const BookingList = () => {
                             ? 'Completed'
                             : 'Upcoming'}
                         </Badge>
+                      )}
+                    </Td>
+                    <Td>
+                      {booking.fitnessClass && (
+                        <Button
+                          size="sm"
+                          colorScheme="teal"
+                          variant="outline"
+                          onClick={() =>
+                            handleViewDetails(booking.fitnessClass!.id)
+                          }
+                        >
+                          View Details
+                        </Button>
                       )}
                     </Td>
                   </Tr>
