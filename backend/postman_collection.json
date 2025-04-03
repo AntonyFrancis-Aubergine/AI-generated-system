@@ -212,6 +212,37 @@
             "description": "Book a fitness class for the current user. Requires authentication. Class must start at least 1 hour from now to be eligible for booking."
           },
           "response": []
+        },
+        {
+          "name": "Get Fitness Class",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/fitness-classes/:fitnessClassId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "fitness-classes", ":fitnessClassId"],
+              "variable": [
+                {
+                  "key": "fitnessClassId",
+                  "value": "your-fitness-class-id",
+                  "description": "ID of the fitness class to retrieve"
+                }
+              ]
+            },
+            "description": "Get a specific fitness class by ID. Returns detailed information including the category and instructor."
+          },
+          "response": []
         }
       ],
       "description": "Endpoints for users to interact with fitness classes"
@@ -448,6 +479,81 @@
         }
       ],
       "description": "Admin-only endpoints"
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/categories?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "categories"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get all fitness class categories with pagination. Returns category ID, name, and description."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "your-user-id",
+                  "description": "ID of the user to retrieve (use your own ID unless you're an admin)"
+                }
+              ]
+            },
+            "description": "Get user details by ID. Users can only access their own profile unless they are admins. Returns user data without the password."
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [

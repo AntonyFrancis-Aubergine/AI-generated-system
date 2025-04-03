@@ -310,3 +310,43 @@ export const deleteFitnessClass = async (
     where: { id: fitnessClassId },
   })
 }
+
+/**
+ * Fetch all fitness class categories with pagination
+ * @param pagination Pagination parameters
+ * @returns Paginated result of fitness class categories
+ */
+export const fetchFitnessClassCategories = async (
+  pagination: Pagination
+): Promise<PaginatedResult<Prisma.FitnessClassCategoryGetPayload<{}>>> => {
+  const { page, limit } = pagination
+  const skip = (page - 1) * limit
+
+  // Get total count for pagination metadata
+  const totalItems = await prisma.fitnessClassCategory.count()
+
+  const categories = await prisma.fitnessClassCategory.findMany({
+    skip,
+    take: limit,
+    orderBy: {
+      name: 'asc',
+    },
+  })
+
+  // Calculate pagination metadata
+  const totalPages = Math.ceil(totalItems / limit)
+  const hasNextPage = page < totalPages
+  const hasPreviousPage = page > 1
+
+  return {
+    data: categories,
+    meta: {
+      currentPage: page,
+      totalPages,
+      totalItems,
+      itemsPerPage: limit,
+      hasNextPage,
+      hasPreviousPage,
+    },
+  }
+}

@@ -96,9 +96,27 @@ A Postman collection is included in the project root (`postman_collection.json`)
     - `instructorId` - Filter by instructor ID
     - `startDateFrom` - Filter classes starting after this date
     - `startDateTo` - Filter classes starting before this date
+- `GET /api/v1/fitness-classes/:fitnessClassId` - Get a single fitness class by ID
+  - Returns detailed information about a specific fitness class
+  - Includes category and instructor details
 - `POST /api/v1/fitness-classes/:fitnessClassId` - Book a fitness class
   - Only allows booking classes that start more than 1 hour from now
   - Uses authenticated user's ID for booking
+
+#### Categories
+
+- `GET /api/v1/categories` - Get all fitness class categories with pagination
+  - Returns category ID, name, and description
+  - Query parameters:
+    - `page` - Page number (default: 1)
+    - `limit` - Items per page (default: 10)
+
+#### User Management
+
+- `GET /api/v1/users/:userId` - Get user details by ID
+  - Requires authentication
+  - Users can only access their own profile unless they are admins
+  - Returns user data without the password
 
 #### User Bookings
 

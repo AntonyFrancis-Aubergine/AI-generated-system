@@ -16,6 +16,17 @@ fitnessClassRouter.get(
 )
 
 /**
+ * @route GET /api/v1/fitness-classes/:fitnessClassId
+ * @desc Get a single fitness class by ID
+ * @access Authenticated users
+ */
+fitnessClassRouter.get(
+  '/:fitnessClassId',
+  authenticate,
+  FitnessClassController.getFitnessClassById
+)
+
+/**
  * @route POST /api/v1/fitness-classes/:fitnessClassId
  * @desc Book a fitness class for the current logged-in user
  * @access Authenticated users

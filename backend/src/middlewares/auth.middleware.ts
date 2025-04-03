@@ -92,3 +92,36 @@ export const hasRole = (roles: string[]) => {
     next()
   }
 }
+
+/**
+ * Middleware to check if user is requesting their own data or is an admin
+ */
+export const isSelfOrAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (!req.user) {
+    res.status(STATUS_CODES.CLIENT_ERROR.UNAUTHORIZED).json(
+      APIResponse.sendError({
+        message: MESSAGES.AUTH.UNAUTHORIZED,
+      })
+    )
+    return
+  }
+
+  // Allow access if user is requesting their own data or is an admin
+  if (
+    req.user.userId === req.params.userId ||
+    req.user.role === CONSTANTS.AUTH.ROLES.ADMIN
+  ) {
+    next()
+    return
+  }
+
+  res.status(STATUS_CODES.CLIENT_ERROR.FORBIDDEN).json(
+    APIResponse.sendError({
+      message: MESSAGES.AUTH.FORBIDDEN,
+    })
+  )
+}

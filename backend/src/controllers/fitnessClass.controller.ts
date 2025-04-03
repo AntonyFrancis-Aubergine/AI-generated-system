@@ -317,3 +317,60 @@ export const deleteFitnessClass = catchAsync(
     }
   }
 )
+
+/**
+ * Get fitness class by ID
+ */
+export const getFitnessClassById = catchAsync(
+  async (req: Request, res: Response) => {
+    const { fitnessClassId } = req.params
+
+    const fitnessClass = await FitnessClassService.fetchFitnessClass({
+      id: fitnessClassId as string,
+    })
+
+    if (!fitnessClass) {
+      return res.status(STATUS_CODES.CLIENT_ERROR.NOT_FOUND).json(
+        APIResponse.sendError({
+          message: MESSAGES.NOT_FOUND('Fitness class'),
+        })
+      )
+    }
+
+    return res.status(STATUS_CODES.SUCCESS.OK).json(
+      APIResponse.sendSuccess({
+        message: MESSAGES.RETRIEVE_SUCCESS('Fitness class'),
+        data: fitnessClass,
+      })
+    )
+  }
+)
+
+/**
+ * Get all fitness class categories with pagination
+ */
+export const getFitnessClassCategories = catchAsync(
+  async (req: Request, res: Response) => {
+    // Parse pagination parameters with defaults
+    const pagination: Pagination = {
+      page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
+      limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
+    }
+
+    // Ensure pagination parameters are valid
+    if (pagination.page < 1) pagination.page = 1
+    if (pagination.limit < 1) pagination.limit = 10
+    if (pagination.limit > 100) pagination.limit = 100
+
+    const categories = await FitnessClassService.fetchFitnessClassCategories(
+      pagination
+    )
+
+    return res.status(STATUS_CODES.SUCCESS.OK).json(
+      APIResponse.sendSuccess({
+        message: MESSAGES.RETRIEVE_SUCCESS('Fitness class categories'),
+        data: categories,
+      })
+    )
+  }
+)
