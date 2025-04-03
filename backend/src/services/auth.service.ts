@@ -1,12 +1,12 @@
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import prisma from '../config/db'
-import { CONSTANTS } from '../utils/constants'
-import { AuthTypes } from '../types'
-import { APIError } from '../utils/customError'
-import { STATUS_CODES } from '../utils/statusCodes'
-import { MESSAGES } from '../utils/messages'
-import { UserRole } from '@prisma/client'
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import prisma from "../config/db";
+import { CONSTANTS } from "../utils/constants";
+import { AuthTypes } from "../types";
+import { APIError } from "../utils/customError";
+import { STATUS_CODES } from "../utils/statusCodes";
+import { MESSAGES } from "../utils/messages";
+import { UserRole } from "@prisma/client";
 
 /**
  * Register a new user
@@ -19,30 +19,44 @@ export const register = async (
   // Check if user already exists
   const existingUser = await prisma.user.findUnique({
     where: { email: userData.email },
-  })
+  });
 
   if (existingUser) {
     throw new APIError(
       STATUS_CODES.CLIENT_ERROR.CONFLICT,
       MESSAGES.AUTH.EMAIL_EXISTS,
       true
-    )
+    );
+  }
+
+  // Check for admin role and validate admin code
+  if (userData.role === CONSTANTS.AUTH.ROLES.ADMIN) {
+    if (
+      !userData.adminCode ||
+      userData.adminCode !== CONSTANTS.AUTH.ADMIN_CODE
+    ) {
+      throw new APIError(
+        STATUS_CODES.CLIENT_ERROR.FORBIDDEN,
+        MESSAGES.AUTH.INVALID_ADMIN_CODE,
+        true
+      );
+    }
   }
 
   // Hash password
   const hashedPassword = await bcrypt.hash(
     userData.password,
     CONSTANTS.AUTH.SALT_ROUNDS
-  )
+  );
 
   // Process date of birth if provided
-  let dobDate: Date | null = null
+  let dobDate: Date | null = null;
   if (userData.dob) {
-    dobDate = new Date(userData.dob)
+    dobDate = new Date(userData.dob);
   }
 
   // Create user with proper role mapping
-  const userRole = mapRole(userData.role)
+  const userRole = mapRole(userData.role);
 
   // Create user with proper null handling for optional fields
   const user = await prisma.user.create({
@@ -55,13 +69,13 @@ export const register = async (
       address: userData.address || null,
       dob: dobDate,
     },
-  })
+  });
 
   // Return the user object without the password
-  const { password, ...userWithoutPassword } = user
+  const { password, ...userWithoutPassword } = user;
 
-  return userWithoutPassword as AuthTypes.RegisterResponse
-}
+  return userWithoutPassword as AuthTypes.RegisterResponse;
+};
 
 /**
  * Login a user
@@ -74,28 +88,28 @@ export const login = async (
   // Find user by email
   const user = await prisma.user.findUnique({
     where: { email: loginData.email },
-  })
+  });
 
   if (!user) {
     throw new APIError(
       STATUS_CODES.CLIENT_ERROR.UNAUTHORIZED,
       MESSAGES.AUTH.INVALID_CREDENTIALS,
       true
-    )
+    );
   }
 
   // Verify password
   const isPasswordValid = await bcrypt.compare(
     loginData.password,
     user.password
-  )
+  );
 
   if (!isPasswordValid) {
     throw new APIError(
       STATUS_CODES.CLIENT_ERROR.UNAUTHORIZED,
       MESSAGES.AUTH.INVALID_CREDENTIALS,
       true
-    )
+    );
   }
 
   // Generate JWT token
@@ -103,16 +117,16 @@ export const login = async (
     userId: user.id,
     email: user.email,
     role: user.role,
-  })
+  });
 
   // Return the user object without the password
-  const { password, ...userWithoutPassword } = user
+  const { password, ...userWithoutPassword } = user;
 
   return {
     token,
     user: userWithoutPassword as AuthTypes.UserResponse,
-  }
-}
+  };
+};
 
 /**
  * Maps the role string to UserRole enum
@@ -122,15 +136,15 @@ export const login = async (
 const mapRole = (role: string): UserRole => {
   switch (role) {
     case CONSTANTS.AUTH.ROLES.USER:
-      return UserRole.USER
+      return UserRole.USER;
     case CONSTANTS.AUTH.ROLES.INSTRUCTOR:
-      return UserRole.INSTRUCTOR
+      return UserRole.INSTRUCTOR;
     case CONSTANTS.AUTH.ROLES.ADMIN:
-      return UserRole.ADMIN
+      return UserRole.ADMIN;
     default:
-      return UserRole.USER
+      return UserRole.USER;
   }
-}
+};
 
 /**
  * Generate a JWT token
@@ -140,5 +154,5 @@ const mapRole = (role: string): UserRole => {
 const generateToken = (payload: AuthTypes.JwtPayload): string => {
   return jwt.sign(payload, CONSTANTS.AUTH.JWT.SECRET, {
     expiresIn: CONSTANTS.AUTH.JWT.EXPIRES_IN,
-  } as jwt.SignOptions)
-}
+  } as jwt.SignOptions);
+};

@@ -1,18 +1,22 @@
-import { Router } from 'express'
-import fitnessClassRouter from './fitnessClass.routes'
-import instructorRouter from './instructor.routes'
-import { authenticate, hasRole } from '../../middlewares/auth.middleware'
-import { CONSTANTS } from '../../utils/constants'
+import { Router } from "express";
+import fitnessClassRouter from "./fitnessClass.routes";
+import instructorRouter from "./instructor.routes";
+import dashboardRouter from "./dashboard.routes";
+import { authenticate, hasRole } from "../../middlewares/auth.middleware";
+import { CONSTANTS } from "../../utils/constants";
 
-const adminRouter = Router()
+const adminRouter = Router();
 
 // Apply admin role check middleware to all admin routes
-adminRouter.use(authenticate, hasRole([CONSTANTS.AUTH.ROLES.ADMIN]))
+adminRouter.use(authenticate, hasRole([CONSTANTS.AUTH.ROLES.ADMIN]));
 
 // Fitness class admin routes
-adminRouter.use('/fitness-classes', fitnessClassRouter)
+adminRouter.use("/fitness-classes", fitnessClassRouter);
 
 // Instructor admin routes
-adminRouter.use('/instructors', instructorRouter)
+adminRouter.use("/instructors", instructorRouter);
 
-export default adminRouter
+// Dashboard admin routes
+adminRouter.use("/dashboard", dashboardRouter);
+
+export default adminRouter;

@@ -4,107 +4,108 @@ import {
   useState,
   useEffect,
   ReactNode,
-} from 'react'
-import { LoginRequest, RegisterRequest, User } from '../types'
-import { authService } from '../services/api'
+} from "react";
+import { LoginRequest, RegisterRequest, User, AuthResponse } from "../types";
+import { authService } from "../services/api";
 
 interface AuthContextType {
-  user: User | null
-  token: string | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  login: (data: LoginRequest) => Promise<void>
-  register: (data: RegisterRequest) => Promise<void>
-  logout: () => void
-  error: string | null
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (data: LoginRequest) => Promise<AuthResponse>;
+  register: (data: RegisterRequest) => Promise<void>;
+  logout: () => void;
+  error: string | null;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
-}
+  return context;
+};
 
 interface AuthProviderProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [token, setToken] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is already logged in
-    const storedToken = localStorage.getItem('token')
-    const storedUser = localStorage.getItem('user')
+    const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
 
     if (storedToken && storedUser) {
-      setToken(storedToken)
-      setUser(JSON.parse(storedUser))
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
     }
 
-    setIsLoading(false)
-  }, [])
+    setIsLoading(false);
+  }, []);
 
-  const login = async (data: LoginRequest) => {
+  const login = async (data: LoginRequest): Promise<AuthResponse> => {
     try {
-      setIsLoading(true)
-      setError(null)
-      const response = await authService.login(data)
+      setIsLoading(true);
+      setError(null);
+      const response = await authService.login(data);
 
       if (response.success && response.data) {
-        const { user, token } = response.data
-        setUser(user)
-        setToken(token)
-        localStorage.setItem('token', token)
-        localStorage.setItem('user', JSON.stringify(user))
+        const { user, token } = response.data;
+        setUser(user);
+        setToken(token);
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        return { user, token };
       } else {
-        throw new Error(response.message || 'Login failed')
+        throw new Error(response.message || "Login failed");
       }
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to login'
-      setError(errorMessage)
-      throw err
+        err instanceof Error ? err.message : "Failed to login";
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const register = async (data: RegisterRequest) => {
     try {
-      setIsLoading(true)
-      setError(null)
-      const response = await authService.register(data)
+      setIsLoading(true);
+      setError(null);
+      const response = await authService.register(data);
 
       if (response.success) {
         // After registration, proceed to login
-        await login({ email: data.email, password: data.password })
+        await login({ email: data.email, password: data.password });
       } else {
-        throw new Error(response.message || 'Registration failed')
+        throw new Error(response.message || "Registration failed");
       }
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to register'
-      setError(errorMessage)
-      throw err
+        err instanceof Error ? err.message : "Failed to register";
+      setError(errorMessage);
+      throw err;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    setUser(null)
-    setToken(null)
-  }
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    setToken(null);
+  };
 
   const value = {
     user,
@@ -115,7 +116,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     register,
     logout,
     error,
-  }
+  };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

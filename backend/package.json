@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node --env-file=.env dist/server.js",
-    "dev": "ts-node --env-file=.env src/server.ts",
+    "dev": "ts-node src/server.ts",
     "seed": "ts-node src/scripts/seed.ts"
   },
   "author": "",
