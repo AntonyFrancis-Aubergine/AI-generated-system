@@ -79,9 +79,10 @@ const Register = () => {
       setError(null)
       await registerUser(data as RegisterRequest)
       navigate('/')
-    } catch (err) {
+    } catch (err: any) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to register'
+        err.response?.data?.message ||
+        (err instanceof Error ? err.message : 'Failed to register')
       setError(errorMessage)
     } finally {
       setIsLoading(false)

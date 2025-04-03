@@ -13,6 +13,7 @@ export interface User {
   mobile?: string
   address?: string
   dob?: string
+  classCount?: number // Number of classes an instructor is teaching
   createdAt: string
   updatedAt: string
 }
@@ -48,6 +49,7 @@ export interface FitnessClass {
   instructor?: User
   startsAt: string
   endsAt: string
+  bookings?: Booking[]
   createdAt: string
   updatedAt: string
 }

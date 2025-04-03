@@ -67,9 +67,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } else {
         throw new Error(response.message || 'Login failed')
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to login'
+        err.response?.data?.message ||
+        (err instanceof Error ? err.message : 'Failed to login')
       setError(errorMessage)
       throw err
     } finally {
@@ -89,9 +90,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } else {
         throw new Error(response.message || 'Registration failed')
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to register'
+        err.response?.data?.message ||
+        (err instanceof Error ? err.message : 'Failed to register')
       setError(errorMessage)
       throw err
     } finally {

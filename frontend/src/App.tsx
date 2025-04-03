@@ -23,8 +23,16 @@ const ClassList = lazy(() => import('./pages/user/ClassList'))
 const BookingList = lazy(() => import('./pages/user/BookingList'))
 const UserProfile = lazy(() => import('./pages/user/UserProfile'))
 
+// Instructor pages
+const InstructorClasses = lazy(
+  () => import('./pages/instructor/InstructorClasses')
+)
+
 // Admin pages
 const AdminClassManagement = lazy(() => import('./pages/admin/ClassManagement'))
+const AdminInstructorManagement = lazy(
+  () => import('./pages/admin/InstructorManagement')
+)
 
 // Common pages
 const Home = lazy(() => import('./pages/Home'))
@@ -55,10 +63,20 @@ function App() {
                   <Route path="/my-bookings" element={<BookingList />} />
                   <Route path="/profile" element={<UserProfile />} />
 
+                  {/* Instructor routes */}
+                  <Route
+                    path="/instructor/classes"
+                    element={<InstructorClasses />}
+                  />
+
                   {/* Admin routes */}
                   <Route
                     path="/admin/classes"
                     element={<AdminClassManagement />}
+                  />
+                  <Route
+                    path="/admin/instructors"
+                    element={<AdminInstructorManagement />}
                   />
 
                   {/* Catch-all */}

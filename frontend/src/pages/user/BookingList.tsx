@@ -17,7 +17,14 @@ import {
   Badge,
   Spinner,
   Link,
+  FormControl,
+  FormLabel,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Select,
 } from '@chakra-ui/react'
+import { SearchIcon } from '@chakra-ui/icons'
 import { format } from 'date-fns'
 import { bookingService } from '../../services/api'
 import { Booking } from '../../types'
@@ -29,15 +36,45 @@ const BookingList = () => {
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [startDate, setStartDate] = useState<string>('')
+  const [endDate, setEndDate] = useState<string>('')
+  const [statusFilter, setStatusFilter] = useState<string>('')
 
   const fetchBookings = async () => {
     try {
       setIsLoading(true)
       setError(null)
-      const response = await bookingService.getBookings(page, 10)
+      const response = await bookingService.getBookings(
+        page,
+        10,
+        startDate,
+        endDate
+      )
 
       if (response.success) {
-        setBookings(response.data.data)
+        let filteredBookings = response.data.data
+
+        // Client-side filtering by class name (until backend supports it)
+        if (searchTerm) {
+          filteredBookings = filteredBookings.filter((booking) =>
+            booking.fitnessClass?.name
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())
+          )
+        }
+
+        // Client-side filtering by status
+        if (statusFilter) {
+          const now = new Date()
+          filteredBookings = filteredBookings.filter((booking) => {
+            if (!booking.fitnessClass) return false
+            const isCompleted = new Date(booking.fitnessClass.endsAt) < now
+            return statusFilter === 'completed' ? isCompleted : !isCompleted
+          })
+        }
+
+        setBookings(filteredBookings)
         setTotalPages(response.data.meta.totalPages)
       } else {
         setError(response.message)
@@ -53,7 +90,7 @@ const BookingList = () => {
 
   useEffect(() => {
     fetchBookings()
-  }, [page])
+  }, [page, startDate, endDate, searchTerm, statusFilter])
 
   const formatDateTime = (dateString: string) => {
     return format(new Date(dateString), 'MMM dd, yyyy h:mm a')
@@ -74,6 +111,11 @@ const BookingList = () => {
     navigate(`/classes/${classId}`)
   }
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    setPage(1) // Reset to first page when search criteria change
+  }
+
   return (
     <Container maxW="container.xl">
       <Stack spacing={8}>
@@ -82,6 +124,63 @@ const BookingList = () => {
             My Bookings
           </Heading>
           <Text color="gray.600">View all your booked fitness classes</Text>
+        </Box>
+
+        {/* Search and Filters */}
+        <Box as="form" onSubmit={handleSearch}>
+          <Stack spacing={4} direction={{ base: 'column', md: 'row' }} mb={6}>
+            <FormControl>
+              <FormLabel>Search</FormLabel>
+              <InputGroup>
+                <InputLeftElement pointerEvents="none">
+                  <SearchIcon color="gray.400" />
+                </InputLeftElement>
+                <Input
+                  placeholder="Search by class name"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </InputGroup>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>Status</FormLabel>
+              <Select
+                placeholder="All Bookings"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="upcoming">Upcoming</option>
+                <option value="completed">Completed</option>
+              </Select>
+            </FormControl>
+          </Stack>
+
+          <Stack spacing={4} direction={{ base: 'column', md: 'row' }}>
+            <FormControl>
+              <FormLabel>Start Date</FormLabel>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>End Date</FormLabel>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </FormControl>
+
+            <FormControl alignSelf="flex-end">
+              <Button colorScheme="teal" type="submit">
+                Filter
+              </Button>
+            </FormControl>
+          </Stack>
         </Box>
 
         {isLoading ? (

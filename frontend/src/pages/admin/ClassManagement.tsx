@@ -29,8 +29,10 @@ import {
   Input,
   Select,
   FormErrorMessage,
+  InputGroup,
+  InputLeftElement,
 } from '@chakra-ui/react'
-import { AddIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons'
+import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons'
 import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -52,12 +54,30 @@ const fitnessClassSchema = z
     name: z.string().min(3, 'Name must be at least 3 characters'),
     categoryId: z.string().min(1, 'Category is required'),
     instructorId: z.string().min(1, 'Instructor is required'),
-    startsAt: z.string().min(1, 'Start time is required'),
-    endsAt: z.string().min(1, 'End time is required'),
+    startsAt: z
+      .string()
+      .min(1, 'Start time is required')
+      .refine((val) => !isNaN(Date.parse(val)), {
+        message: 'Invalid start time format',
+      }),
+    endsAt: z
+      .string()
+      .min(1, 'End time is required')
+      .refine((val) => !isNaN(Date.parse(val)), {
+        message: 'Invalid end time format',
+      }),
   })
   .refine(
     (data) => {
-      return new Date(data.startsAt) < new Date(data.endsAt)
+      // Ensure dates are valid before comparison
+      if (!data.startsAt || !data.endsAt) return true
+
+      const startDate = new Date(data.startsAt)
+      const endDate = new Date(data.endsAt)
+
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return true
+
+      return startDate < endDate
     },
     {
       message: 'End time must be after start time',
@@ -114,17 +134,20 @@ const ClassManagement = () => {
       } else {
         toast({
           title: 'Error',
-          description: 'Failed to fetch categories',
+          description: response.message || 'Failed to fetch categories',
           status: 'error',
           duration: 5000,
           isClosable: true,
         })
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch categories:', err)
+      const errorMessage =
+        err.response?.data?.message ||
+        (err instanceof Error ? err.message : 'Failed to fetch categories')
       toast({
         title: 'Error',
-        description: 'Failed to fetch categories',
+        description: errorMessage,
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -137,23 +160,26 @@ const ClassManagement = () => {
   const fetchInstructors = async () => {
     try {
       setIsInstructorsLoading(true)
-      const response = await userService.getInstructors()
+      const response = await adminService.getAllInstructors()
       if (response.success) {
-        setInstructors(response.data)
+        setInstructors(response.data.data)
       } else {
         toast({
           title: 'Error',
-          description: 'Failed to fetch instructors',
+          description: response.message || 'Failed to fetch instructors',
           status: 'error',
           duration: 5000,
           isClosable: true,
         })
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch instructors:', err)
+      const errorMessage =
+        err.response?.data?.message ||
+        (err instanceof Error ? err.message : 'Failed to fetch instructors')
       toast({
         title: 'Error',
-        description: 'Failed to fetch instructors',
+        description: errorMessage,
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -175,9 +201,10 @@ const ClassManagement = () => {
       } else {
         setError(response.message)
       }
-    } catch (err) {
+    } catch (err: any) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to fetch classes'
+        err.response?.data?.message ||
+        (err instanceof Error ? err.message : 'Failed to fetch classes')
       setError(errorMessage)
     } finally {
       setIsLoading(false)
@@ -249,9 +276,10 @@ const ClassManagement = () => {
           isClosable: true,
         })
       }
-    } catch (err) {
+    } catch (err: any) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to delete class'
+        err.response?.data?.message ||
+        (err instanceof Error ? err.message : 'Failed to delete class')
       toast({
         title: 'Error',
         description: errorMessage,
@@ -268,11 +296,18 @@ const ClassManagement = () => {
     try {
       setIsSubmitting(true)
 
+      // Format dates to ISO format with Z suffix to ensure UTC format
+      const formattedData = {
+        ...data,
+        startsAt: new Date(data.startsAt).toISOString(),
+        endsAt: new Date(data.endsAt).toISOString(),
+      }
+
       if (currentClass) {
         // Update existing class
         const response = await adminService.updateClass(
           currentClass.id,
-          data as UpdateFitnessClassRequest
+          formattedData as UpdateFitnessClassRequest
         )
 
         if (response.success) {
@@ -297,7 +332,7 @@ const ClassManagement = () => {
       } else {
         // Create new class
         const response = await adminService.createClass(
-          data as CreateFitnessClassRequest
+          formattedData as CreateFitnessClassRequest
         )
 
         if (response.success) {
@@ -320,9 +355,10 @@ const ClassManagement = () => {
           })
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to save class'
+        err.response?.data?.message ||
+        (err instanceof Error ? err.message : 'Failed to save class')
       toast({
         title: 'Error',
         description: errorMessage,
@@ -365,6 +401,111 @@ const ClassManagement = () => {
             Add New Class
           </Button>
         </Flex>
+
+        {/* Search and Filters */}
+        <Box
+          as="form"
+          onSubmit={(e: React.FormEvent) => {
+            e.preventDefault()
+            setFilters((prev) => ({ ...prev, page: 1 }))
+          }}
+        >
+          <Stack spacing={4} direction={{ base: 'column', md: 'row' }} mb={6}>
+            <FormControl>
+              <FormLabel>Search</FormLabel>
+              <InputGroup>
+                <InputLeftElement pointerEvents="none">
+                  <SearchIcon color="gray.400" />
+                </InputLeftElement>
+                <Input
+                  placeholder="Search by class name"
+                  value={filters.name || ''}
+                  onChange={(e) =>
+                    setFilters((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                />
+              </InputGroup>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>Category</FormLabel>
+              <Select
+                placeholder="All Categories"
+                value={filters.categoryId || ''}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    categoryId: e.target.value || undefined,
+                  }))
+                }
+                isDisabled={isCategoriesLoading}
+              >
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>Instructor</FormLabel>
+              <Select
+                placeholder="All Instructors"
+                value={filters.instructorId || ''}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    instructorId: e.target.value || undefined,
+                  }))
+                }
+                isDisabled={isInstructorsLoading}
+              >
+                {instructors.map((instructor) => (
+                  <option key={instructor.id} value={instructor.id}>
+                    {instructor.name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+
+          <Stack spacing={4} direction={{ base: 'column', md: 'row' }}>
+            <FormControl>
+              <FormLabel>Start Date From</FormLabel>
+              <Input
+                type="date"
+                value={filters.startDateFrom || ''}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    startDateFrom: e.target.value || undefined,
+                  }))
+                }
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>Start Date To</FormLabel>
+              <Input
+                type="date"
+                value={filters.startDateTo || ''}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    startDateTo: e.target.value || undefined,
+                  }))
+                }
+              />
+            </FormControl>
+
+            <FormControl alignSelf="flex-end">
+              <Button colorScheme="teal" type="submit">
+                Filter
+              </Button>
+            </FormControl>
+          </Stack>
+        </Box>
 
         {isLoading ? (
           <Flex justifyContent="center" py={10}>

@@ -28,7 +28,11 @@ const getNavItems = (role: UserRole | undefined) => {
 
   switch (role) {
     case UserRole.ADMIN:
-      return [...commonItems, { label: 'Manage Classes', to: '/admin/classes' }]
+      return [
+        ...commonItems,
+        { label: 'Manage Classes', to: '/admin/classes' },
+        { label: 'Manage Instructors', to: '/admin/instructors' },
+      ]
     case UserRole.INSTRUCTOR:
       return [
         ...commonItems,

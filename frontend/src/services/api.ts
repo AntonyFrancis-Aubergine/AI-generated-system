@@ -113,12 +113,14 @@ export const categoryService = {
 export const bookingService = {
   getBookings: async (
     page = 1,
-    limit = 10
+    limit = 10,
+    startDate?: string,
+    endDate?: string
   ): Promise<ApiResponse<PaginatedResponse<Booking>>> => {
     const response = await api.get<ApiResponse<PaginatedResponse<Booking>>>(
       '/bookings',
       {
-        params: { page, limit },
+        params: { page, limit, startDate, endDate },
       }
     )
     return response.data
@@ -195,6 +197,43 @@ export const adminService = {
     const response = await adminApi.delete<ApiResponse<void>>(
       `/fitness-classes/${id}`
     )
+    return response.data
+  },
+
+  getAllInstructors: async (
+    page = 1,
+    limit = 10,
+    name?: string
+  ): Promise<ApiResponse<PaginatedResponse<User>>> => {
+    const adminApi = axios.create({
+      baseURL: ADMIN_API_URL,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+
+    const response = await adminApi.get<ApiResponse<PaginatedResponse<User>>>(
+      '/instructors',
+      {
+        params: { page, limit, name },
+      }
+    )
+    return response.data
+  },
+}
+
+// Instructor Services
+export const instructorService = {
+  getInstructorClasses: async (
+    page = 1,
+    limit = 10
+  ): Promise<ApiResponse<PaginatedResponse<FitnessClass>>> => {
+    const response = await api.get<
+      ApiResponse<PaginatedResponse<FitnessClass>>
+    >('/instructors/classes', {
+      params: { page, limit },
+    })
     return response.data
   },
 }

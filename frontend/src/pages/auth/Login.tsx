@@ -51,9 +51,10 @@ const Login = () => {
       setError(null)
       await login(data as LoginRequest)
       navigate('/')
-    } catch (err) {
+    } catch (err: any) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to login'
+        err.response?.data?.message ||
+        (err instanceof Error ? err.message : 'Failed to login')
       setError(errorMessage)
     } finally {
       setIsLoading(false)
