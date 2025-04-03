@@ -128,6 +128,15 @@ A Postman collection is included in the project root (`postman_collection.json`)
     - `page` - Page number (default: 1)
     - `limit` - Items per page (default: 10)
 
+#### Instructor Endpoints
+
+- `GET /api/v1/instructors/classes` - Get all classes for which the authenticated user is an instructor
+  - Requires authentication and INSTRUCTOR role
+  - Returns fitness class details including booking information
+  - Query parameters:
+    - `page` - Page number (default: 1)
+    - `limit` - Items per page (default: 10)
+
 #### Admin Endpoints (All require ADMIN role)
 
 - `GET /api/admin/fitness-classes` - Get all fitness classes with filtering and pagination
@@ -152,6 +161,12 @@ A Postman collection is included in the project root (`postman_collection.json`)
 - `DELETE /api/admin/fitness-classes/:fitnessClassId` - Delete a fitness class
   - Cannot delete classes that have active bookings
   - Returns a success message when deletion is successful
+- `GET /api/admin/instructors` - Get all instructors with pagination
+  - Returns instructor details including class count
+  - Query parameters:
+    - `page` - Page number (default: 1)
+    - `limit` - Items per page (default: 10)
+    - `name` - Search instructors by name (optional, case-insensitive)
 
 ## Project Structure
 

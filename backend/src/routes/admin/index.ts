@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import fitnessClassRouter from './fitnessClass.routes'
+import instructorRouter from './instructor.routes'
 import { authenticate, hasRole } from '../../middlewares/auth.middleware'
 import { CONSTANTS } from '../../utils/constants'
 
@@ -10,5 +11,8 @@ adminRouter.use(authenticate, hasRole([CONSTANTS.AUTH.ROLES.ADMIN]))
 
 // Fitness class admin routes
 adminRouter.use('/fitness-classes', fitnessClassRouter)
+
+// Instructor admin routes
+adminRouter.use('/instructors', instructorRouter)
 
 export default adminRouter

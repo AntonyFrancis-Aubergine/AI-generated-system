@@ -5,6 +5,7 @@ import fitnessClassRouter from './fitnessClass.routes'
 import bookingRouter from './booking.routes'
 import categoryRouter from './category.routes'
 import userRouter from './user.routes'
+import instructorRouter from './instructor.routes'
 
 const v1Router = Router()
 
@@ -25,5 +26,8 @@ v1Router.use('/categories', categoryRouter)
 
 // User routes
 v1Router.use('/users', userRouter)
+
+// Instructor routes
+v1Router.use('/instructors', instructorRouter)
 
 export default v1Router
