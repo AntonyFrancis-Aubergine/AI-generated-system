@@ -31,8 +31,19 @@ import {
   FormErrorMessage,
   InputGroup,
   InputLeftElement,
+  Collapse,
+  HStack,
+  Divider,
 } from '@chakra-ui/react'
-import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons'
+import {
+  AddIcon,
+  EditIcon,
+  DeleteIcon,
+  SearchIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CloseIcon,
+} from '@chakra-ui/icons'
 import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -123,6 +134,11 @@ const ClassManagement = () => {
     setValue,
   } = useForm<FitnessClassFormData>({
     resolver: zodResolver(fitnessClassSchema),
+  })
+
+  const [isFiltersApplied, setIsFiltersApplied] = useState(false)
+  const { isOpen: isFilterOpen, onToggle: toggleFilter } = useDisclosure({
+    defaultIsOpen: false,
   })
 
   const fetchCategories = async () => {
@@ -219,6 +235,23 @@ const ClassManagement = () => {
   useEffect(() => {
     fetchClasses()
   }, [filters])
+
+  useEffect(() => {
+    // Check if any filters are applied
+    setIsFiltersApplied(
+      !!filters.name ||
+        !!filters.categoryId ||
+        !!filters.instructorId ||
+        !!filters.startDateFrom ||
+        !!filters.startDateTo
+    )
+  }, [
+    filters.name,
+    filters.categoryId,
+    filters.instructorId,
+    filters.startDateFrom,
+    filters.startDateTo,
+  ])
 
   const handleAddClass = () => {
     setCurrentClass(null)
@@ -381,6 +414,13 @@ const ClassManagement = () => {
     return format(new Date(dateString), 'MMM dd, yyyy h:mm a')
   }
 
+  const clearFilters = () => {
+    setFilters({
+      page: 1,
+      limit: 10,
+    })
+  }
+
   return (
     <Container maxW="container.xl">
       <Stack spacing={8}>
@@ -402,110 +442,172 @@ const ClassManagement = () => {
           </Button>
         </Flex>
 
-        {/* Search and Filters */}
-        <Box
-          as="form"
-          onSubmit={(e: React.FormEvent) => {
-            e.preventDefault()
-            setFilters((prev) => ({ ...prev, page: 1 }))
-          }}
-        >
-          <Stack spacing={4} direction={{ base: 'column', md: 'row' }} mb={6}>
-            <FormControl>
-              <FormLabel>Search</FormLabel>
-              <InputGroup>
-                <InputLeftElement pointerEvents="none">
-                  <SearchIcon color="gray.400" />
-                </InputLeftElement>
-                <Input
-                  placeholder="Search by class name"
-                  value={filters.name || ''}
-                  onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                />
-              </InputGroup>
-            </FormControl>
-
-            <FormControl>
-              <FormLabel>Category</FormLabel>
-              <Select
-                placeholder="All Categories"
-                value={filters.categoryId || ''}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    categoryId: e.target.value || undefined,
-                  }))
-                }
-                isDisabled={isCategoriesLoading}
-              >
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl>
-              <FormLabel>Instructor</FormLabel>
-              <Select
-                placeholder="All Instructors"
-                value={filters.instructorId || ''}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    instructorId: e.target.value || undefined,
-                  }))
-                }
-                isDisabled={isInstructorsLoading}
-              >
-                {instructors.map((instructor) => (
-                  <option key={instructor.id} value={instructor.id}>
-                    {instructor.name}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-          </Stack>
-
-          <Stack spacing={4} direction={{ base: 'column', md: 'row' }}>
-            <FormControl>
-              <FormLabel>Start Date From</FormLabel>
-              <Input
-                type="date"
-                value={filters.startDateFrom || ''}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    startDateFrom: e.target.value || undefined,
-                  }))
-                }
+        {/* Search bar and filter toggle */}
+        <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
+          <InputGroup maxW={{ base: '100%', md: '400px' }}>
+            <InputLeftElement pointerEvents="none">
+              <SearchIcon color="gray.400" />
+            </InputLeftElement>
+            <Input
+              placeholder="Search by class name"
+              value={filters.name || ''}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  name: e.target.value,
+                  page: 1,
+                }))
+              }
+              onKeyPress={(e) => e.key === 'Enter' && fetchClasses()}
+            />
+            {filters.name && (
+              <IconButton
+                icon={<CloseIcon />}
+                size="sm"
+                aria-label="Clear search"
+                position="absolute"
+                right="2"
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex="1"
+                variant="ghost"
+                onClick={() => {
+                  setFilters((prev) => ({ ...prev, name: '', page: 1 }))
+                  fetchClasses()
+                }}
               />
-            </FormControl>
+            )}
+          </InputGroup>
 
-            <FormControl>
-              <FormLabel>Start Date To</FormLabel>
-              <Input
-                type="date"
-                value={filters.startDateTo || ''}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    startDateTo: e.target.value || undefined,
-                  }))
-                }
-              />
-            </FormControl>
-
-            <FormControl alignSelf="flex-end">
-              <Button colorScheme="teal" type="submit">
-                Filter
+          <HStack>
+            {isFiltersApplied && (
+              <Button
+                colorScheme="red"
+                variant="outline"
+                size="sm"
+                leftIcon={<CloseIcon />}
+                onClick={clearFilters}
+              >
+                Clear Filters
               </Button>
-            </FormControl>
-          </Stack>
-        </Box>
+            )}
+            <Button
+              rightIcon={isFilterOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+              onClick={toggleFilter}
+              colorScheme="teal"
+              variant="outline"
+              size="sm"
+            >
+              Filters
+            </Button>
+          </HStack>
+        </Flex>
+
+        {/* Collapsible Filter Section */}
+        <Collapse in={isFilterOpen} animateOpacity>
+          <Box
+            p={4}
+            bg="gray.50"
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="gray.200"
+            mb={4}
+          >
+            <form
+              onSubmit={(e: React.FormEvent) => {
+                e.preventDefault()
+                setFilters((prev) => ({ ...prev, page: 1 }))
+                fetchClasses()
+              }}
+            >
+              <Stack spacing={4}>
+                <Flex direction={{ base: 'column', md: 'row' }} gap={4}>
+                  <FormControl>
+                    <FormLabel>Category</FormLabel>
+                    <Select
+                      placeholder="All Categories"
+                      value={filters.categoryId || ''}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          categoryId: e.target.value || undefined,
+                          page: 1,
+                        }))
+                      }
+                      isDisabled={isCategoriesLoading}
+                    >
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>Instructor</FormLabel>
+                    <Select
+                      placeholder="All Instructors"
+                      value={filters.instructorId || ''}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          instructorId: e.target.value || undefined,
+                          page: 1,
+                        }))
+                      }
+                      isDisabled={isInstructorsLoading}
+                    >
+                      {instructors.map((instructor) => (
+                        <option key={instructor.id} value={instructor.id}>
+                          {instructor.name}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Flex>
+
+                <Flex direction={{ base: 'column', md: 'row' }} gap={4}>
+                  <FormControl>
+                    <FormLabel>Start Date From</FormLabel>
+                    <Input
+                      type="date"
+                      value={filters.startDateFrom || ''}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          startDateFrom: e.target.value || undefined,
+                          page: 1,
+                        }))
+                      }
+                    />
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>Start Date To</FormLabel>
+                    <Input
+                      type="date"
+                      value={filters.startDateTo || ''}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          startDateTo: e.target.value || undefined,
+                          page: 1,
+                        }))
+                      }
+                    />
+                  </FormControl>
+                </Flex>
+
+                <Flex justify="flex-end">
+                  <Button colorScheme="teal" type="submit">
+                    Apply Filters
+                  </Button>
+                </Flex>
+              </Stack>
+            </form>
+          </Box>
+        </Collapse>
 
         {isLoading ? (
           <Flex justifyContent="center" py={10}>

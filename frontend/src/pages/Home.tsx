@@ -55,7 +55,7 @@ const Home = () => {
         actions.push({
           title: 'My Bookings',
           description: 'View your booked classes and schedule.',
-          link: '/bookings',
+          link: '/my-bookings',
           linkText: 'View Bookings',
         })
         break

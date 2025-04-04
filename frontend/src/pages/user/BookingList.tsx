@@ -23,8 +23,18 @@ import {
   InputGroup,
   InputLeftElement,
   Select,
+  Collapse,
+  useDisclosure,
+  HStack,
+  IconButton,
+  Divider,
 } from '@chakra-ui/react'
-import { SearchIcon } from '@chakra-ui/icons'
+import {
+  SearchIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CloseIcon,
+} from '@chakra-ui/icons'
 import { format } from 'date-fns'
 import { bookingService } from '../../services/api'
 import { Booking } from '../../types'
@@ -40,6 +50,10 @@ const BookingList = () => {
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('')
+  const { isOpen: isFilterOpen, onToggle: toggleFilter } = useDisclosure({
+    defaultIsOpen: false,
+  })
+  const [isFiltersApplied, setIsFiltersApplied] = useState(false)
 
   const fetchBookings = async () => {
     try {
@@ -79,9 +93,10 @@ const BookingList = () => {
       } else {
         setError(response.message)
       }
-    } catch (err) {
+    } catch (err: any) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to fetch bookings'
+        err.response?.data?.message ||
+        (err instanceof Error ? err.message : 'Failed to fetch bookings')
       setError(errorMessage)
     } finally {
       setIsLoading(false)
@@ -90,7 +105,14 @@ const BookingList = () => {
 
   useEffect(() => {
     fetchBookings()
-  }, [page, startDate, endDate, searchTerm, statusFilter])
+  }, [page])
+
+  useEffect(() => {
+    // Check if any filters are applied
+    setIsFiltersApplied(
+      !!searchTerm || !!startDate || !!endDate || !!statusFilter
+    )
+  }, [searchTerm, startDate, endDate, statusFilter])
 
   const formatDateTime = (dateString: string) => {
     return format(new Date(dateString), 'MMM dd, yyyy h:mm a')
@@ -114,6 +136,16 @@ const BookingList = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     setPage(1) // Reset to first page when search criteria change
+    fetchBookings()
+  }
+
+  const clearFilters = () => {
+    setSearchTerm('')
+    setStartDate('')
+    setEndDate('')
+    setStatusFilter('')
+    setPage(1)
+    fetchBookings()
   }
 
   return (
@@ -126,62 +158,115 @@ const BookingList = () => {
           <Text color="gray.600">View all your booked fitness classes</Text>
         </Box>
 
-        {/* Search and Filters */}
-        <Box as="form" onSubmit={handleSearch}>
-          <Stack spacing={4} direction={{ base: 'column', md: 'row' }} mb={6}>
-            <FormControl>
-              <FormLabel>Search</FormLabel>
-              <InputGroup>
-                <InputLeftElement pointerEvents="none">
-                  <SearchIcon color="gray.400" />
-                </InputLeftElement>
-                <Input
-                  placeholder="Search by class name"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </InputGroup>
-            </FormControl>
+        {/* Search Bar and Filter Toggle */}
+        <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
+          <InputGroup maxW={{ base: '100%', md: '400px' }}>
+            <InputLeftElement pointerEvents="none">
+              <SearchIcon color="gray.400" />
+            </InputLeftElement>
+            <Input
+              placeholder="Search by class name"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
+            />
+            {searchTerm && (
+              <IconButton
+                icon={<CloseIcon />}
+                size="sm"
+                aria-label="Clear search"
+                position="absolute"
+                right="2"
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex="1"
+                variant="ghost"
+                onClick={() => {
+                  setSearchTerm('')
+                  setPage(1)
+                  fetchBookings()
+                }}
+              />
+            )}
+          </InputGroup>
 
-            <FormControl>
-              <FormLabel>Status</FormLabel>
-              <Select
-                placeholder="All Bookings"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+          <HStack>
+            {isFiltersApplied && (
+              <Button
+                colorScheme="red"
+                variant="outline"
+                size="sm"
+                leftIcon={<CloseIcon />}
+                onClick={clearFilters}
               >
-                <option value="upcoming">Upcoming</option>
-                <option value="completed">Completed</option>
-              </Select>
-            </FormControl>
-          </Stack>
-
-          <Stack spacing={4} direction={{ base: 'column', md: 'row' }}>
-            <FormControl>
-              <FormLabel>Start Date</FormLabel>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </FormControl>
-
-            <FormControl>
-              <FormLabel>End Date</FormLabel>
-              <Input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </FormControl>
-
-            <FormControl alignSelf="flex-end">
-              <Button colorScheme="teal" type="submit">
-                Filter
+                Clear Filters
               </Button>
-            </FormControl>
-          </Stack>
-        </Box>
+            )}
+            <Button
+              rightIcon={isFilterOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+              onClick={toggleFilter}
+              colorScheme="teal"
+              variant="outline"
+              size="sm"
+            >
+              Filters
+            </Button>
+          </HStack>
+        </Flex>
+
+        {/* Collapsible Filter Section */}
+        <Collapse in={isFilterOpen} animateOpacity>
+          <Box
+            p={4}
+            bg="gray.50"
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="gray.200"
+            mb={4}
+          >
+            <form onSubmit={handleSearch}>
+              <Stack spacing={4}>
+                <Flex direction={{ base: 'column', md: 'row' }} gap={4}>
+                  <FormControl>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      placeholder="All Bookings"
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                      <option value="upcoming">Upcoming</option>
+                      <option value="completed">Completed</option>
+                    </Select>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>Start Date</FormLabel>
+                    <Input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                    />
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>End Date</FormLabel>
+                    <Input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                  </FormControl>
+                </Flex>
+
+                <Flex justify="flex-end">
+                  <Button colorScheme="teal" type="submit">
+                    Apply Filters
+                  </Button>
+                </Flex>
+              </Stack>
+            </form>
+          </Box>
+        </Collapse>
 
         {isLoading ? (
           <Flex justifyContent="center" py={10}>
