@@ -130,6 +130,13 @@ A Postman collection is included in the project root (`postman_collection.json`)
 
 #### Instructor Endpoints
 
+- `GET /api/v1/instructors` - Get all instructors with pagination and name search
+  - Requires authentication
+  - Returns instructor details including class count
+  - Query parameters:
+    - `page` - Page number (default: 1)
+    - `limit` - Items per page (default: 10)
+    - `name` - Search instructors by name (optional, case-insensitive)
 - `GET /api/v1/instructors/classes` - Get all classes for which the authenticated user is an instructor
   - Requires authentication and INSTRUCTOR role
   - Returns fitness class details including booking information

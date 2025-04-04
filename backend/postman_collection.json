@@ -293,6 +293,48 @@
       "name": "Instructors",
       "item": [
         {
+          "name": "Get All Instructors",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/instructors?page=1&limit=10&name=smith",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "instructors"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items per page"
+                },
+                {
+                  "key": "name",
+                  "value": "smith",
+                  "description": "Search instructor by name (optional)",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get a list of all instructors with pagination and optional name search. Requires authentication. Returns instructor data including the count of classes they teach."
+          },
+          "response": []
+        },
+        {
           "name": "Get Instructor Classes",
           "request": {
             "auth": {
