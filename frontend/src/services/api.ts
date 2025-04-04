@@ -57,8 +57,17 @@ export const userService = {
     return response.data
   },
 
-  getInstructors: async (): Promise<ApiResponse<User[]>> => {
-    const response = await api.get<ApiResponse<User[]>>('/users/instructors')
+  getInstructors: async (
+    page = 1,
+    limit = 10,
+    name?: string
+  ): Promise<ApiResponse<PaginatedResponse<User>>> => {
+    const response = await api.get<ApiResponse<PaginatedResponse<User>>>(
+      '/instructors',
+      {
+        params: { page, limit, name },
+      }
+    )
     return response.data
   },
 }

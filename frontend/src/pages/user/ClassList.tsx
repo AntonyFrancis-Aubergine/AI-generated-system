@@ -25,15 +25,21 @@ import {
 } from '@chakra-ui/react'
 import { SearchIcon } from '@chakra-ui/icons'
 import { format } from 'date-fns'
-import { fitnessClassService, categoryService } from '../../services/api'
-import { FitnessClass, FitnessClassFilters, Category } from '../../types'
+import {
+  fitnessClassService,
+  categoryService,
+  userService,
+} from '../../services/api'
+import { FitnessClass, FitnessClassFilters, Category, User } from '../../types'
 import { useNavigate } from 'react-router-dom'
 
 const ClassList = () => {
   const [classes, setClasses] = useState<FitnessClass[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [instructors, setInstructors] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true)
+  const [isInstructorsLoading, setIsInstructorsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState<FitnessClassFilters>({
     page: 1,
@@ -61,6 +67,20 @@ const ClassList = () => {
     }
   }
 
+  const fetchInstructors = async () => {
+    try {
+      setIsInstructorsLoading(true)
+      const response = await userService.getInstructors()
+      if (response.success) {
+        setInstructors(response.data.data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch instructors:', err)
+    } finally {
+      setIsInstructorsLoading(false)
+    }
+  }
+
   const fetchClasses = async () => {
     try {
       setIsLoading(true)
@@ -84,6 +104,7 @@ const ClassList = () => {
 
   useEffect(() => {
     fetchCategories()
+    fetchInstructors()
   }, [])
 
   useEffect(() => {
@@ -211,10 +232,13 @@ const ClassList = () => {
                     instructorId: e.target.value || undefined,
                   }))
                 }
+                isDisabled={isInstructorsLoading}
               >
-                {/* Instructors would be populated dynamically */}
-                <option value="instructor1">John Doe</option>
-                <option value="instructor2">Jane Smith</option>
+                {instructors.map((instructor) => (
+                  <option key={instructor.id} value={instructor.id}>
+                    {instructor.name}
+                  </option>
+                ))}
               </Select>
             </FormControl>
 
