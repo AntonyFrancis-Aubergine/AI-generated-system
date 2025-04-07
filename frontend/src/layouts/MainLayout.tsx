@@ -36,6 +36,7 @@ import {
   FaDumbbell,
   FaCalendarCheck,
   FaSignOutAlt,
+  FaUserFriends,
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { UserRole } from "../types";
@@ -103,6 +104,7 @@ const getNavItems = (role: UserRole | undefined): NavItem[] => {
         ...commonItems,
         { label: "Browse Classes", to: "/classes", icon: <FaDumbbell /> },
         { label: "My Bookings", to: "/my-bookings", icon: <FaCalendarCheck /> },
+        { label: "Friends", to: "/friends", icon: <FaUserFriends /> },
       ];
     default:
       return commonItems;

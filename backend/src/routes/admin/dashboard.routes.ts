@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { getDashboardStats } from "../../controllers/dashboard.controller";
 
 const router = Router();
@@ -8,8 +8,12 @@ const router = Router();
  * @description Get dashboard statistics for admin
  * @access Private (Admin)
  */
-router.get("/stats", function (req: Request, res: Response) {
-  return getDashboardStats(req, res);
+router.get("/stats", (req: Request, res: Response, next: NextFunction) => {
+  try {
+    getDashboardStats(req, res);
+  } catch (error) {
+    next(error);
+  }
 });
 
 export default router;

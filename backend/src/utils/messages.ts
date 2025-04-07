@@ -41,6 +41,8 @@ export const MESSAGES = {
   REQUIRED_ONE_VALUE: "At least one value is required",
 
   ERROR: "Something went wrong.",
+  FORBIDDEN: "Access forbidden",
+  UNAUTHORIZED: "Unauthorized access",
   FORBIDDEN_MSG: "Unauthorized access",
   LOG_OUT_SUCCESS: "Logged out successfully",
   DATABASE_ERROR: "Database Error",

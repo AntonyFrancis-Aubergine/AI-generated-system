@@ -5,3 +5,4 @@ export * as BookingController from "./fitnessClassBooking.controller";
 export * as UserController from "./user.controller";
 export * as InstructorController from "./instructor.controller";
 export * as DashboardController from "./dashboard.controller";
+export * as FriendshipController from "./friendship.controller";

@@ -112,3 +112,39 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+
+// Add a FriendshipStatus enum that mirrors the backend
+export enum FriendshipStatus {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  REJECTED = "REJECTED",
+}
+
+export interface Friendship {
+  id: string;
+  status: FriendshipStatus;
+  senderId: string;
+  receiverId: string;
+  createdAt: string;
+  updatedAt: string;
+  sender: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  receiver: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export interface CreateFriendRequestRequest {
+  receiverId: string;
+}
+
+export interface FriendshipFilters {
+  status?: FriendshipStatus;
+  page?: number;
+  limit?: number;
+}

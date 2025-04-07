@@ -25,6 +25,7 @@ export interface LoginRequest {
  */
 export interface JwtPayload {
   userId: string;
+  id: string;
   email: string;
   role: string;
 }
