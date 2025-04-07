@@ -79,19 +79,7 @@ const registerSchema = z.object({
   mobile: z.string().optional(),
   address: z.string().optional(),
   dob: z.string().optional(),
-  adminCode: z
-    .string()
-    .optional()
-    .refine(
-      (val) => {
-        // If role is ADMIN, then adminCode is required
-        return val !== "" || val !== undefined;
-      },
-      {
-        message: "Admin code is required for admin registration",
-        path: ["adminCode"],
-      }
-    ),
+  adminCode: z.string().optional(),
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -133,7 +121,7 @@ const Register = () => {
 
   const selectedRole = watch("role");
 
-  // Show the admin code input when the role is ADMIN
+  // Show the admin code input when the role is ADMIN (optional now)
   const handleTabChange = (index: number) => {
     const role = index === 0 ? "USER" : index === 1 ? "INSTRUCTOR" : "ADMIN";
     setValue("role", role);
@@ -144,16 +132,6 @@ const Register = () => {
     try {
       setIsLoading(true);
       setError(null);
-
-      // If user is trying to register as an admin but admin code is missing
-      if (
-        data.role === "ADMIN" &&
-        (!data.adminCode || data.adminCode.trim() === "")
-      ) {
-        setError("Admin code is required for admin registration");
-        setIsLoading(false);
-        return;
-      }
 
       await registerUser(data as RegisterRequest);
 
@@ -290,9 +268,8 @@ const Register = () => {
                         </Text>
                       </HStack>
                       <Text fontSize="sm" color={textColor}>
-                        Admin registration requires an authorization code. Only
-                        register as an admin if you have been authorized to do
-                        so.
+                        Admin registration is now simplified. You can register
+                        as an admin without an authorization code.
                       </Text>
                     </Box>
                   </TabPanel>
@@ -377,13 +354,13 @@ const Register = () => {
               <MotionBox variants={itemVariants} width="100%">
                 <FormControl isInvalid={!!errors.adminCode}>
                   <FormLabel fontWeight="medium">
-                    Admin Authorization Code
+                    Admin Authorization Code (Optional)
                   </FormLabel>
                   <InputGroup size="lg">
                     <InputLeftAddon children={<LockIcon color="red.500" />} />
                     <Input
                       type="password"
-                      placeholder="Enter admin authorization code"
+                      placeholder="Enter admin authorization code (optional)"
                       focusBorderColor="red.400"
                       borderRadius="md"
                       {...register("adminCode")}

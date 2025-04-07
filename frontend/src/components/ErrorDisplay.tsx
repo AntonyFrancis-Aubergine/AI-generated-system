@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import {
   Alert,
   AlertIcon,
@@ -9,6 +10,7 @@ import {
   useDisclosure,
   useColorModeValue,
   Flex,
+  BoxProps,
 } from "@chakra-ui/react";
 
 interface ErrorDisplayProps {
@@ -26,6 +28,8 @@ interface ErrorDisplayProps {
   autoCloseTimeout?: number;
   /** Whether this is a form error (more compact display) */
   isFormError?: boolean;
+  /** Margin bottom, passed to the container */
+  mb?: BoxProps["mb"];
 }
 
 const ErrorDisplay = ({
@@ -36,12 +40,13 @@ const ErrorDisplay = ({
   autoClose = false,
   autoCloseTimeout = 5000,
   isFormError = false,
+  mb,
 }: ErrorDisplayProps) => {
   const { isOpen, onClose } = useDisclosure({ defaultIsOpen: true });
   const bgColor = useColorModeValue("red.50", "rgba(254, 178, 178, 0.16)");
 
   // Auto-close functionality
-  React.useEffect(() => {
+  useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
     if (autoClose && error) {
@@ -68,7 +73,14 @@ const ErrorDisplay = ({
   if (isFormError) {
     return (
       <Collapse in={isOpen} animateOpacity>
-        <Alert status="error" variant="left-accent" my={2} py={2} size="sm">
+        <Alert
+          status="error"
+          variant="left-accent"
+          my={2}
+          py={2}
+          size="sm"
+          mb={mb}
+        >
           <AlertIcon />
           <Flex justify="space-between" width="100%" align="center">
             <AlertDescription fontSize="sm">{error}</AlertDescription>
@@ -82,7 +94,7 @@ const ErrorDisplay = ({
   // Standard error display
   return (
     <Collapse in={isOpen} animateOpacity>
-      <Box my={4}>
+      <Box my={4} mb={mb}>
         <Alert
           status="error"
           variant="subtle"

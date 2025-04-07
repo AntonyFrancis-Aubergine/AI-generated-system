@@ -68,7 +68,6 @@ export const MESSAGES = {
       "Password is too weak. It should be at least 8 characters and include uppercase, lowercase, numbers, and special characters",
     TOKEN_INVALID: "Invalid authentication token",
     TOKEN_MISSING: "Authentication token is missing",
-    INVALID_ADMIN_CODE: "Invalid admin authorization code",
   },
 
   FITNESS_CLASS: {

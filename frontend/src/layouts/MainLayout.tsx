@@ -67,8 +67,9 @@ const Logo = () => {
       letterSpacing="tight"
       display="flex"
       alignItems="center"
+      justifyContent="center"
     >
-      <Box mr={1}>
+      <Box mr={2} display="flex" alignItems="center">
         <StarIcon color="purple.500" />
       </Box>
       FitBook
@@ -78,8 +79,25 @@ const Logo = () => {
 
 // Navigation items based on user role
 const getNavItems = (role: UserRole | undefined): NavItem[] => {
+  // Define home route based on user role
+  let homeRoute = "/";
+
+  if (role) {
+    switch (role) {
+      case UserRole.ADMIN:
+        homeRoute = "/admin/dashboard";
+        break;
+      case UserRole.INSTRUCTOR:
+        homeRoute = "/instructor/dashboard";
+        break;
+      case UserRole.USER:
+        homeRoute = "/user/dashboard";
+        break;
+    }
+  }
+
   const commonItems: NavItem[] = [
-    { label: "Home", to: "/", icon: <FaDumbbell /> },
+    { label: "Home", to: homeRoute, icon: <FaDumbbell /> },
   ];
 
   if (!role) return commonItems;
@@ -104,7 +122,7 @@ const getNavItems = (role: UserRole | undefined): NavItem[] => {
         ...commonItems,
         { label: "Browse Classes", to: "/classes", icon: <FaDumbbell /> },
         { label: "My Bookings", to: "/my-bookings", icon: <FaCalendarCheck /> },
-        { label: "Friends", to: "/friends", icon: <FaUserFriends /> },
+        // { label: "Friends", to: "/friends", icon: <FaUserFriends /> },
       ];
     default:
       return commonItems;

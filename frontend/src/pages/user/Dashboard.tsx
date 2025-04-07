@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Box,
   Heading,
@@ -18,11 +19,22 @@ import {
   CardBody,
   CardHeader,
   Divider,
+  Spinner,
+  Tooltip,
 } from "@chakra-ui/react";
-import { FaCalendarCheck, FaDumbbell, FaTrophy, FaHeart } from "react-icons/fa";
+import {
+  FaCalendarCheck,
+  FaDumbbell,
+  FaTrophy,
+  FaHeart,
+  FaSync,
+} from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
+import { userService, bookingService } from "../../services/api";
 import { Link as RouterLink } from "react-router-dom";
+import { ActivityType, UserActivity } from "../../types";
+import { format } from "date-fns";
 
 // Create motion components
 const MotionBox = motion(Box);
@@ -52,6 +64,12 @@ const itemVariants = {
 
 const UserDashboard = () => {
   const { user } = useAuth();
+  const [upcomingClasses, setUpcomingClasses] = useState<number>(0);
+  const [completedClasses, setCompletedClasses] = useState<number>(0);
+  const [fitnessScore, setFitnessScore] = useState<number>(0);
+  const [recentActivity, setRecentActivity] = useState<UserActivity[]>([]);
+  const [isActivityLoading, setIsActivityLoading] = useState<boolean>(true);
+  const [isStatsLoading, setIsStatsLoading] = useState<boolean>(true);
 
   // Theme colors
   const cardBg = useColorModeValue("white", "gray.800");
@@ -62,19 +80,78 @@ const UserDashboard = () => {
   const buttonBgGradient = "linear(to-r, purple.600, pink.500)";
   const buttonHoverBgGradient = "linear(to-r, purple.700, pink.600)";
 
-  // Mock data
-  const upcomingClasses = 2;
-  const completedClasses = 15;
-  const fitnessScore = 85;
+  // Fetch user activity
+  const fetchActivity = async () => {
+    try {
+      setIsActivityLoading(true);
+      const response = await userService.getUserActivity(5);
+      if (response.success) {
+        setRecentActivity(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching user activity:", error);
+      // If there's an error, set empty array
+      setRecentActivity([]);
+    } finally {
+      setIsActivityLoading(false);
+    }
+  };
 
-  // Recent activity data (would typically come from API)
-  const recentActivity = [
-    { id: 1, type: "Booking", title: "Yoga Class", date: "2023-08-15" },
-    { id: 2, type: "Completed", title: "HIIT Workout", date: "2023-08-12" },
-    { id: 3, type: "Booking", title: "Pilates", date: "2023-08-10" },
-  ];
+  // Fetch basic stats
+  const fetchStats = async () => {
+    try {
+      setIsStatsLoading(true);
 
-  // Recommended classes
+      // Get bookings for stats
+      const bookingsResponse = await bookingService.getBookings(1, 100);
+
+      if (bookingsResponse.success) {
+        const bookings = bookingsResponse.data.data;
+        const now = new Date();
+
+        // Calculate upcoming classes (where class end time is in the future)
+        const upcoming = bookings.filter(
+          (booking) =>
+            booking.fitnessClass && new Date(booking.fitnessClass.endsAt) > now
+        ).length;
+
+        // Calculate completed classes (where class end time is in the past)
+        const completed = bookings.filter(
+          (booking) =>
+            booking.fitnessClass && new Date(booking.fitnessClass.endsAt) <= now
+        ).length;
+
+        // Set state values
+        setUpcomingClasses(upcoming);
+        setCompletedClasses(completed);
+
+        // Calculate simple fitness score based on activity (just a demo calculation)
+        const score = Math.min(100, 50 + completed * 5);
+        setFitnessScore(score);
+      }
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+      // Set default values
+      setUpcomingClasses(0);
+      setCompletedClasses(0);
+      setFitnessScore(50);
+    } finally {
+      setIsStatsLoading(false);
+    }
+  };
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchActivity();
+    fetchStats();
+  }, []);
+
+  // Format date nicely
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), "MMM dd, yyyy");
+  };
+
+  // Recommended classes (static for now - could be fetched from API in the future)
   const recommendedClasses = [
     {
       id: 1,
@@ -89,6 +166,11 @@ const UserDashboard = () => {
       duration: "45 min",
     },
   ];
+
+  // Handle refresh of activity
+  const handleRefreshActivity = () => {
+    fetchActivity();
+  };
 
   return (
     <MotionBox initial="hidden" animate="visible" variants={containerVariants}>
@@ -121,9 +203,13 @@ const UserDashboard = () => {
             <Icon as={FaCalendarCheck} mr={2} color="purple.500" />
             Upcoming Classes
           </StatLabel>
-          <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
-            {upcomingClasses}
-          </StatNumber>
+          {isStatsLoading ? (
+            <Spinner size="sm" color="purple.500" mt={2} />
+          ) : (
+            <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
+              {upcomingClasses}
+            </StatNumber>
+          )}
           <StatHelpText>Classes this week</StatHelpText>
           <Button
             as={RouterLink}
@@ -149,19 +235,23 @@ const UserDashboard = () => {
             <Icon as={FaDumbbell} mr={2} color="purple.500" />
             Completed Classes
           </StatLabel>
-          <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
-            {completedClasses}
-          </StatNumber>
+          {isStatsLoading ? (
+            <Spinner size="sm" color="purple.500" mt={2} />
+          ) : (
+            <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
+              {completedClasses}
+            </StatNumber>
+          )}
           <StatHelpText>Total classes completed</StatHelpText>
           <Button
             as={RouterLink}
-            to="/profile"
+            to="/my-bookings"
             size="sm"
             mt={2}
             variant="outline"
             colorScheme="purple"
           >
-            View History
+            View Histor
           </Button>
         </Stat>
 
@@ -175,15 +265,19 @@ const UserDashboard = () => {
         >
           <StatLabel display="flex" alignItems="center">
             <Icon as={FaTrophy} mr={2} color="purple.500" />
-            Fitness Score
+            Fitness Score (coming soon)
           </StatLabel>
-          <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
-            {fitnessScore}/100
-          </StatNumber>
+          {isStatsLoading ? (
+            <Spinner size="sm" color="purple.500" mt={2} />
+          ) : (
+            <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
+              {fitnessScore}/100
+            </StatNumber>
+          )}
           <StatHelpText>Based on your activity</StatHelpText>
           <Button
             as={RouterLink}
-            to="/profile"
+            to="/classes"
             size="sm"
             mt={2}
             variant="outline"
@@ -280,76 +374,117 @@ const UserDashboard = () => {
             _hover={{ boxShadow: "md" }}
           >
             <CardHeader pb={0}>
-              <Heading size="md" mb={2} color={headingColor}>
-                Recent Activity
-              </Heading>
-              <Text fontSize="sm" color={textColor}>
-                Your latest actions and bookings
-              </Text>
+              <Flex justify="space-between" align="center">
+                <Box>
+                  <Heading size="md" mb={2} color={headingColor}>
+                    Recent Activity
+                  </Heading>
+                  <Text fontSize="sm" color={textColor}>
+                    Your latest actions and bookings
+                  </Text>
+                </Box>
+                <Tooltip label="Refresh activity">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    colorScheme="purple"
+                    isLoading={isActivityLoading}
+                    onClick={handleRefreshActivity}
+                    aria-label="Refresh activity"
+                  >
+                    <Icon as={FaSync} />
+                  </Button>
+                </Tooltip>
+              </Flex>
             </CardHeader>
             <CardBody>
-              <VStack spacing={4} align="stretch">
-                {recentActivity.map((activity) => (
-                  <HStack
-                    key={activity.id}
-                    justify="space-between"
-                    p={3}
-                    borderWidth="1px"
-                    borderRadius="md"
-                    borderColor={cardBorder}
+              {isActivityLoading ? (
+                <Flex justify="center" py={10}>
+                  <Spinner size="lg" color="purple.500" />
+                </Flex>
+              ) : recentActivity.length === 0 ? (
+                <Box textAlign="center" py={5}>
+                  <Text color={textColor}>
+                    No recent activity found. Book some classes to see your
+                    activity here!
+                  </Text>
+                  <Button
+                    as={RouterLink}
+                    to="/classes"
+                    colorScheme="purple"
+                    variant="outline"
+                    mt={4}
                   >
-                    <VStack align="start" spacing={0}>
-                      <HStack>
-                        <Icon
-                          as={
-                            activity.type === "Booking"
-                              ? FaCalendarCheck
-                              : FaDumbbell
-                          }
-                          color={
-                            activity.type === "Booking"
-                              ? "green.500"
-                              : "blue.500"
-                          }
-                        />
-                        <Text fontWeight="medium">{activity.title}</Text>
-                      </HStack>
-                      <Text fontSize="sm" color={textColor}>
-                        {activity.type} on{" "}
-                        {new Date(activity.date).toLocaleDateString()}
-                      </Text>
-                    </VStack>
-                    <chakra.span
-                      px={2}
-                      py={1}
-                      bg={
-                        activity.type === "Booking" ? "green.100" : "blue.100"
-                      }
-                      color={
-                        activity.type === "Booking" ? "green.700" : "blue.700"
-                      }
-                      fontSize="xs"
-                      fontWeight="bold"
-                      rounded="md"
-                      textTransform="uppercase"
+                    Browse Classes
+                  </Button>
+                </Box>
+              ) : (
+                <VStack spacing={4} align="stretch">
+                  {recentActivity.map((activity) => (
+                    <HStack
+                      key={activity.id}
+                      justify="space-between"
+                      p={3}
+                      borderWidth="1px"
+                      borderRadius="md"
+                      borderColor={cardBorder}
                     >
-                      {activity.type}
-                    </chakra.span>
-                  </HStack>
-                ))}
+                      <VStack align="start" spacing={0}>
+                        <HStack>
+                          <Icon
+                            as={
+                              activity.type === ActivityType.BOOKING
+                                ? FaCalendarCheck
+                                : FaDumbbell
+                            }
+                            color={
+                              activity.type === ActivityType.BOOKING
+                                ? "green.500"
+                                : "blue.500"
+                            }
+                          />
+                          <Text fontWeight="medium">{activity.title}</Text>
+                        </HStack>
+                        <Text fontSize="sm" color={textColor}>
+                          {activity.type} on {formatDate(activity.date)}
+                        </Text>
+                      </VStack>
+                      <chakra.span
+                        px={2}
+                        py={1}
+                        bg={
+                          activity.type === ActivityType.BOOKING
+                            ? "green.100"
+                            : "blue.100"
+                        }
+                        color={
+                          activity.type === ActivityType.BOOKING
+                            ? "green.700"
+                            : "blue.700"
+                        }
+                        fontSize="xs"
+                        fontWeight="bold"
+                        rounded="md"
+                        textTransform="uppercase"
+                      >
+                        {activity.type}
+                      </chakra.span>
+                    </HStack>
+                  ))}
 
-                <Divider borderColor={cardBorder} />
+                  <Divider borderColor={cardBorder} />
 
-                <Button
-                  as={RouterLink}
-                  to="/profile"
-                  variant="outline"
-                  colorScheme="purple"
-                  alignSelf="flex-start"
-                >
-                  View All Activity
-                </Button>
-              </VStack>
+                  <Button
+                    as={RouterLink}
+                    to="/my-bookings"
+                    variant="outline"
+                    colorScheme="purple"
+                    alignSelf="flex-start"
+                  >
+                    View All Activity
+                  </Button>
+                </VStack>
+              )}
             </CardBody>
           </Card>
         </MotionBox>

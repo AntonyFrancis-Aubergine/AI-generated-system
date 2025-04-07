@@ -35,30 +35,11 @@ const AdminClassManagement = lazy(
   () => import("./pages/admin/ClassManagement")
 );
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminUserManagement = lazy(() => import("./pages/admin/UserManagement"));
 
 // Common pages
 const Home = lazy(() => import("./pages/Home"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-
-// Role-based redirect component
-const RoleBasedRedirect = () => {
-  const { user } = useAuth();
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  switch (user.role) {
-    case UserRole.ADMIN:
-      return <Navigate to="/admin/dashboard" replace />;
-    case UserRole.INSTRUCTOR:
-      return <Navigate to="/instructor/dashboard" replace />;
-    case UserRole.USER:
-      return <Navigate to="/user/dashboard" replace />;
-    default:
-      return <Navigate to="/login" replace />;
-  }
-};
 
 function App() {
   return (
@@ -88,8 +69,8 @@ function App() {
                   <Route path="/classes/:classId" element={<ClassDetails />} />
                   <Route path="/my-bookings" element={<BookingList />} />
                   <Route path="/profile" element={<UserProfile />} />
-                  <Route path="/friends" element={<FriendsPage />} />
-                  <Route path="/user/friends" element={<FriendsPage />} />
+                  {/* <Route path="/friends" element={<FriendsPage />} /> */}
+                  {/* <Route path="/user/friends" element={<FriendsPage />} /> */}
 
                   {/* Instructor routes */}
                   <Route
@@ -102,6 +83,10 @@ function App() {
                   <Route
                     path="/admin/classes"
                     element={<AdminClassManagement />}
+                  />
+                  <Route
+                    path="/admin/users"
+                    element={<AdminUserManagement />}
                   />
 
                   {/* Catch-all */}
@@ -118,5 +103,25 @@ function App() {
     </ChakraProvider>
   );
 }
+
+// Role-based redirect component
+const RoleBasedRedirect = () => {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  switch (user.role) {
+    case UserRole.ADMIN:
+      return <Navigate to="/admin/dashboard" replace />;
+    case UserRole.INSTRUCTOR:
+      return <Navigate to="/instructor/dashboard" replace />;
+    case UserRole.USER:
+      return <Navigate to="/user/dashboard" replace />;
+    default:
+      return <Navigate to="/login" replace />;
+  }
+};
 
 export default App;

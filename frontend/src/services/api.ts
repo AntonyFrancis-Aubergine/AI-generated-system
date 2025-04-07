@@ -16,6 +16,7 @@ import {
   FriendshipStatus,
   FriendshipFilters,
   CreateFriendRequestRequest,
+  UserActivity,
 } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
@@ -93,9 +94,14 @@ const handleApiError = (error: unknown): never => {
 const configureInterceptors = (instance: AxiosInstance): void => {
   // Request interceptor
   instance.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    try {
+      const token = localStorage.getItem("token");
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log("Setting auth header with token");
+      }
+    } catch (error) {
+      console.error("Error accessing localStorage:", error);
     }
     return config;
   });
@@ -156,9 +162,30 @@ export const userService = {
 
   getInstructors: async (): Promise<ApiResponse<User[]>> => {
     try {
+      console.log("Calling instructors endpoint");
+      // This is the correct endpoint according to the Postman collection
       const response = await api.get<ApiResponse<User[]>>("/users/instructors");
+      console.log("Raw instructors response:", response);
       return response.data;
     } catch (error) {
+      console.error("Error getting instructors:", error);
+      throw handleApiError(error);
+    }
+  },
+
+  getUserActivity: async (
+    limit: number = 5
+  ): Promise<ApiResponse<UserActivity[]>> => {
+    try {
+      const response = await api.get<ApiResponse<UserActivity[]>>(
+        "/users/activity",
+        {
+          params: { limit },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error getting user activity:", error);
       throw handleApiError(error);
     }
   },
@@ -213,14 +240,17 @@ export const categoryService = {
     limit = 100
   ): Promise<ApiResponse<PaginatedResponse<Category>>> => {
     try {
+      console.log("Calling /categories endpoint with params:", { page, limit });
       const response = await api.get<ApiResponse<PaginatedResponse<Category>>>(
         "/categories",
         {
           params: { page, limit },
         }
       );
+      console.log("Raw categories response:", response);
       return response.data;
     } catch (error) {
+      console.error("Error getting categories:", error);
       throw handleApiError(error);
     }
   },
@@ -287,6 +317,47 @@ export const adminService = {
     }
   },
 
+  // User Management
+  getAllUsers: async (
+    page = 1,
+    limit = 10,
+    name?: string
+  ): Promise<ApiResponse<PaginatedResponse<User>>> => {
+    try {
+      console.log("Calling admin users endpoint with params:", {
+        page,
+        limit,
+        name,
+      });
+      const response = await adminApi.get<ApiResponse<PaginatedResponse<User>>>(
+        "/users",
+        {
+          params: { page, limit, name },
+        }
+      );
+      console.log("Raw admin users response:", response);
+      return response.data;
+    } catch (error) {
+      console.error("Error getting users from admin API:", error);
+      throw handleApiError(error);
+    }
+  },
+
+  deleteUser: async (userId: string): Promise<ApiResponse<void>> => {
+    try {
+      console.log(`Deleting user with ID: ${userId}`);
+      const response = await adminApi.delete<ApiResponse<void>>(
+        `/users/${userId}`
+      );
+      console.log("Delete user response:", response);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Fitness Class Management
   getAllClasses: async (
     filters?: FitnessClassFilters
   ): Promise<ApiResponse<PaginatedResponse<FitnessClass>>> => {
@@ -306,12 +377,25 @@ export const adminService = {
     data: CreateFitnessClassRequest
   ): Promise<ApiResponse<FitnessClass>> => {
     try {
+      console.log(
+        "Creating fitness class with data:",
+        JSON.stringify(data, null, 2)
+      );
+
       const response = await adminApi.post<ApiResponse<FitnessClass>>(
         "/fitness-classes",
         data
       );
+
+      console.log("Create class response:", response.data);
       return response.data;
     } catch (error) {
+      console.error("Error creating fitness class:", error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error("Server response:", error.response.data);
+        console.error("Status code:", error.response.status);
+        console.error("Headers:", error.response.headers);
+      }
       throw handleApiError(error);
     }
   },
@@ -348,14 +432,21 @@ export const adminService = {
     name?: string
   ): Promise<ApiResponse<PaginatedResponse<User>>> => {
     try {
+      console.log("Calling admin instructors endpoint with params:", {
+        page,
+        limit,
+        name,
+      });
       const response = await adminApi.get<ApiResponse<PaginatedResponse<User>>>(
         "/instructors",
         {
           params: { page, limit, name },
         }
       );
+      console.log("Raw admin instructors response:", response);
       return response.data;
     } catch (error) {
+      console.error("Error getting instructors from admin API:", error);
       throw handleApiError(error);
     }
   },

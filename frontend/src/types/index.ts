@@ -5,6 +5,22 @@ export enum UserRole {
   ADMIN = "ADMIN",
 }
 
+// Activity Types for User Dashboard
+export enum ActivityType {
+  BOOKING = "BOOKING",
+  COMPLETED = "COMPLETED",
+  CANCELED = "CANCELED",
+}
+
+export interface UserActivity {
+  id: string;
+  type: ActivityType;
+  title: string;
+  date: string;
+  relatedId?: string; // e.g., booking ID or class ID
+  metadata?: Record<string, any>; // For additional data if needed
+}
+
 export interface User {
   id: string;
   name: string;

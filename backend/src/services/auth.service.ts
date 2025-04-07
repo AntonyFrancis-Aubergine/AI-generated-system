@@ -29,20 +29,6 @@ export const register = async (
     );
   }
 
-  // Check for admin role and validate admin code
-  if (userData.role === CONSTANTS.AUTH.ROLES.ADMIN) {
-    if (
-      !userData.adminCode ||
-      userData.adminCode !== CONSTANTS.AUTH.ADMIN_CODE
-    ) {
-      throw new APIError(
-        STATUS_CODES.CLIENT_ERROR.FORBIDDEN,
-        MESSAGES.AUTH.INVALID_ADMIN_CODE,
-        true
-      );
-    }
-  }
-
   // Hash password
   const hashedPassword = await bcrypt.hash(
     userData.password,

@@ -26,12 +26,30 @@ import {
   HStack,
   IconButton,
   SimpleGrid,
+  useColorModeValue,
+  Tag,
+  TagLabel,
+  Icon,
+  Tooltip,
+  Alert,
+  AlertIcon,
+  VStack,
 } from "@chakra-ui/react";
 import {
   SearchIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  CalendarIcon,
+  TimeIcon,
+  ViewIcon,
 } from "@chakra-ui/icons";
+import {
+  FaChalkboardTeacher,
+  FaFilter,
+  FaLayerGroup,
+  FaCalendarCheck,
+  FaRegCalendarAlt,
+} from "react-icons/fa";
 import { format } from "date-fns";
 import {
   fitnessClassService,
@@ -43,6 +61,49 @@ import { useNavigate } from "react-router-dom";
 import Loading, { InlineLoading } from "../../components/Loading";
 import ErrorDisplay from "../../components/ErrorDisplay";
 import * as toastUtils from "../../utils/toast";
+import { motion } from "framer-motion";
+
+// Create motion components
+const MotionBox = motion(Box);
+const MotionFlex = motion(Flex);
+const MotionCard = motion(Card);
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+    },
+  },
+  hover: {
+    y: -5,
+    boxShadow:
+      "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+    transition: { duration: 0.2 },
+  },
+};
 
 const ClassList = () => {
   const [classes, setClasses] = useState<FitnessClass[]>([]);
@@ -54,7 +115,7 @@ const ClassList = () => {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FitnessClassFilters>({
     page: 1,
-    limit: 10,
+    limit: 12,
     name: "",
   });
   const [totalPages, setTotalPages] = useState(1);
@@ -63,6 +124,14 @@ const ClassList = () => {
   );
   const toast = useToast();
   const navigate = useNavigate();
+
+  // Theme colors
+  const cardBg = useColorModeValue("white", "gray.800");
+  const cardBorder = useColorModeValue("gray.200", "gray.700");
+  const textColor = useColorModeValue("gray.600", "gray.300");
+  const headingColor = useColorModeValue("gray.800", "white");
+  const cardHeaderBg = useColorModeValue("purple.50", "purple.900");
+  const accentColor = "purple";
 
   const fetchCategories = async () => {
     try {
@@ -175,34 +244,61 @@ const ClassList = () => {
     setError(null);
   };
 
+  const getCategoryColor = (categoryName: string = "") => {
+    // Map categories to colors for visual distinction
+    const categoryColors: Record<string, string> = {
+      Yoga: "green",
+      Cardio: "red",
+      "Strength Training": "orange",
+      Pilates: "blue",
+      HIIT: "pink",
+      Zumba: "purple",
+    };
+
+    return categoryColors[categoryName] || "gray";
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      page: 1,
+      limit: 12,
+      name: "",
+      categoryId: undefined,
+      instructorId: undefined,
+    });
+  };
+
   const renderClassCards = () => {
     if (isLoading) {
       // Show skeleton loaders while loading
-      return Array(3)
+      return Array(6)
         .fill(0)
         .map((_, index) => (
-          <Card
+          <MotionCard
             key={`skeleton-${index}`}
+            variants={cardVariants}
             boxShadow="md"
             borderRadius="lg"
             overflow="hidden"
+            borderWidth="1px"
+            borderColor={cardBorder}
           >
-            <CardHeader bg="gray.50" pb={2}>
-              <Skeleton height="20px" width="70%" mb={2} />
-              <Skeleton height="16px" width="40%" />
+            <CardHeader bg={cardHeaderBg} pb={3}>
+              <Skeleton height="24px" width="80%" mb={2} />
+              <Skeleton height="20px" width="40%" />
             </CardHeader>
-            <CardBody pt={3}>
-              <Stack spacing={2}>
-                <SkeletonText noOfLines={3} spacing={2} />
+            <CardBody pt={4}>
+              <Stack spacing={3}>
+                <SkeletonText noOfLines={4} spacing={3} />
               </Stack>
             </CardBody>
             <CardFooter>
-              <Stack spacing={2} width="100%">
+              <Stack spacing={3} width="100%">
                 <Skeleton height="40px" />
                 <Skeleton height="40px" />
               </Stack>
             </CardFooter>
-          </Card>
+          </MotionCard>
         ));
     }
 
@@ -210,19 +306,29 @@ const ClassList = () => {
       return (
         <Box
           textAlign="center"
-          p={8}
+          p={10}
           borderRadius="lg"
           border="1px dashed"
-          borderColor="gray.200"
+          borderColor={cardBorder}
           gridColumn="1 / -1"
+          bg={cardBg}
         >
-          <Text fontSize="lg" mb={4}>
-            No classes found matching your criteria
+          <Icon
+            as={FaRegCalendarAlt}
+            boxSize="50px"
+            color={`${accentColor}.400`}
+            mb={4}
+          />
+          <Heading as="h3" size="md" mb={2}>
+            No classes found
+          </Heading>
+          <Text color={textColor} mb={6}>
+            No fitness classes match your current filters
           </Text>
           <Button
-            colorScheme="teal"
-            variant="outline"
-            onClick={() => setFilters({ page: 1, limit: 10 })}
+            colorScheme={accentColor}
+            leftIcon={<FaFilter />}
+            onClick={handleClearFilters}
           >
             Clear Filters
           </Button>
@@ -231,200 +337,294 @@ const ClassList = () => {
     }
 
     return classes.map((fitnessClass) => (
-      <Card
+      <MotionCard
         key={fitnessClass.id}
+        variants={cardVariants}
+        initial="hidden"
+        animate="visible"
+        whileHover="hover"
         boxShadow="md"
         borderRadius="lg"
         overflow="hidden"
-        transition="transform 0.2s, box-shadow 0.2s"
-        _hover={{ transform: "translateY(-5px)", boxShadow: "lg" }}
+        borderWidth="1px"
+        borderColor={cardBorder}
       >
-        <CardHeader bg="teal.50" pb={2}>
-          <Heading size="md">{fitnessClass.name}</Heading>
-          {fitnessClass.category && (
-            <Badge colorScheme="teal" mt={1}>
-              {fitnessClass.category.name}
-            </Badge>
-          )}
+        <CardHeader bg={cardHeaderBg} pb={3}>
+          <Flex justifyContent="space-between" alignItems="flex-start">
+            <VStack align="flex-start" spacing={1}>
+              <Heading size="md" color={headingColor}>
+                {fitnessClass.name}
+              </Heading>
+              {fitnessClass.category && (
+                <Tag
+                  size="md"
+                  colorScheme={getCategoryColor(fitnessClass.category.name)}
+                  borderRadius="full"
+                >
+                  <TagLabel>{fitnessClass.category.name}</TagLabel>
+                </Tag>
+              )}
+            </VStack>
+          </Flex>
         </CardHeader>
 
-        <CardBody pt={3}>
-          <Stack spacing={2}>
-            <Text>
-              <strong>Instructor:</strong>{" "}
-              {fitnessClass.instructor?.name || "Not specified"}
-            </Text>
-            <Text>
-              <strong>Starts at:</strong>{" "}
-              {formatDateTime(fitnessClass.startsAt)}
-            </Text>
-            <Text>
-              <strong>Ends at:</strong> {formatDateTime(fitnessClass.endsAt)}
-            </Text>
-          </Stack>
+        <CardBody pt={4}>
+          <VStack spacing={3} align="stretch">
+            <HStack>
+              <Icon
+                as={FaChalkboardTeacher}
+                color={`${accentColor}.500`}
+                boxSize={4}
+              />
+              <Text fontWeight="medium">
+                {fitnessClass.instructor?.name || "Not specified"}
+              </Text>
+            </HStack>
+
+            <HStack>
+              <Icon
+                as={CalendarIcon}
+                color={`${accentColor}.500`}
+                boxSize={4}
+              />
+              <Text fontSize="sm">{formatDateTime(fitnessClass.startsAt)}</Text>
+            </HStack>
+
+            <HStack>
+              <Icon as={TimeIcon} color={`${accentColor}.500`} boxSize={4} />
+              <Text fontSize="sm">
+                to {formatDateTime(fitnessClass.endsAt)}
+              </Text>
+            </HStack>
+          </VStack>
         </CardBody>
 
         <Divider />
 
         <CardFooter>
-          <Stack spacing={2} width="100%">
+          <VStack spacing={2} width="100%">
             <Button
-              colorScheme="teal"
+              colorScheme={accentColor}
+              leftIcon={<FaCalendarCheck />}
+              w="100%"
               onClick={() =>
                 handleBookClass(fitnessClass.id, fitnessClass.name)
               }
               isLoading={bookingInProgress === fitnessClass.id}
               loadingText="Booking..."
+              boxShadow="sm"
+              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+              transition="all 0.2s"
             >
               Book Now
             </Button>
             <Button
               variant="outline"
-              colorScheme="teal"
+              colorScheme={accentColor}
+              leftIcon={<ViewIcon />}
+              w="100%"
               onClick={() => handleViewDetails(fitnessClass.id)}
+              _hover={{ bg: `${accentColor}.50` }}
             >
               View Details
             </Button>
-          </Stack>
+          </VStack>
         </CardFooter>
-      </Card>
+      </MotionCard>
     ));
   };
 
   return (
-    <Container maxW="container.xl" py={6}>
-      <Stack spacing={8}>
-        <Box>
-          <Heading as="h1" size="xl" mb={2}>
+    <MotionBox
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      p={4}
+    >
+      {/* Header Section */}
+      <MotionFlex
+        variants={itemVariants}
+        direction={{ base: "column", md: "row" }}
+        justify="space-between"
+        align={{ base: "flex-start", md: "center" }}
+        mb={8}
+      >
+        <Box mb={{ base: 4, md: 0 }}>
+          <Heading as="h1" size="xl" mb={2} color={headingColor}>
             Available Fitness Classes
           </Heading>
-          <Text color="gray.600">
-            Browse and book available fitness classes
+          <Text color={textColor}>
+            Browse and book fitness classes for your next workout
           </Text>
         </Box>
+      </MotionFlex>
 
-        <ErrorDisplay error={error} onClear={handleClearError} />
+      {error && (
+        <ErrorDisplay error={error} onClear={handleClearError} mb={6} />
+      )}
 
-        <Box as="form" onSubmit={handleSearch}>
-          <SimpleGrid columns={{ base: 1, md: 4 }} spacing={4}>
+      {/* Filter Form */}
+      <MotionCard
+        variants={itemVariants}
+        as="form"
+        onSubmit={handleSearch}
+        bg={cardBg}
+        borderWidth="1px"
+        borderColor={cardBorder}
+        borderRadius="lg"
+        boxShadow="sm"
+        overflow="hidden"
+        mb={8}
+      >
+        <CardBody>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={4}>
             <FormControl>
-              <FormLabel>Search</FormLabel>
+              <FormLabel fontWeight="medium">Class Name</FormLabel>
               <InputGroup>
                 <InputLeftElement pointerEvents="none">
                   <SearchIcon color="gray.400" />
                 </InputLeftElement>
                 <Input
-                  placeholder="Search by class name"
+                  placeholder="Search by name"
                   value={filters.name || ""}
                   onChange={(e) =>
                     setFilters((prev) => ({ ...prev, name: e.target.value }))
                   }
+                  focusBorderColor={`${accentColor}.400`}
                 />
               </InputGroup>
             </FormControl>
 
             <FormControl>
-              <FormLabel>Category</FormLabel>
-              <Select
-                placeholder="All Categories"
-                value={filters.categoryId || ""}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    categoryId: e.target.value || undefined,
-                    page: 1, // Reset to first page when filtering
-                  }))
-                }
-                isDisabled={isCategoriesLoading}
-              >
-                {isCategoriesLoading ? (
-                  <option disabled>Loading categories...</option>
-                ) : (
-                  categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))
-                )}
-              </Select>
+              <FormLabel fontWeight="medium">Category</FormLabel>
+              <InputGroup>
+                <InputLeftElement pointerEvents="none">
+                  <Icon as={FaLayerGroup} color="gray.400" />
+                </InputLeftElement>
+                <Select
+                  placeholder="All Categories"
+                  value={filters.categoryId || ""}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      categoryId: e.target.value || undefined,
+                      page: 1, // Reset to first page when filtering
+                    }))
+                  }
+                  isDisabled={isCategoriesLoading}
+                  pl={10}
+                  focusBorderColor={`${accentColor}.400`}
+                >
+                  {isCategoriesLoading ? (
+                    <option disabled>Loading categories...</option>
+                  ) : (
+                    categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))
+                  )}
+                </Select>
+              </InputGroup>
             </FormControl>
 
             <FormControl>
-              <FormLabel>Instructor</FormLabel>
-              <Select
-                placeholder="All Instructors"
-                value={filters.instructorId || ""}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    instructorId: e.target.value || undefined,
-                    page: 1, // Reset to first page when filtering
-                  }))
-                }
-                isDisabled={isInstructorsLoading}
-              >
-                {isInstructorsLoading ? (
-                  <option disabled>Loading instructors...</option>
-                ) : (
-                  instructors.map((instructor) => (
-                    <option key={instructor.id} value={instructor.id}>
-                      {instructor.name}
-                    </option>
-                  ))
-                )}
-              </Select>
+              <FormLabel fontWeight="medium">Instructor</FormLabel>
+              <InputGroup>
+                <InputLeftElement pointerEvents="none">
+                  <Icon as={FaChalkboardTeacher} color="gray.400" />
+                </InputLeftElement>
+                <Select
+                  placeholder="All Instructors"
+                  value={filters.instructorId || ""}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      instructorId: e.target.value || undefined,
+                      page: 1, // Reset to first page when filtering
+                    }))
+                  }
+                  isDisabled={isInstructorsLoading}
+                  pl={10}
+                  focusBorderColor={`${accentColor}.400`}
+                >
+                  {isInstructorsLoading ? (
+                    <option disabled>Loading instructors...</option>
+                  ) : (
+                    instructors.map((instructor) => (
+                      <option key={instructor.id} value={instructor.id}>
+                        {instructor.name}
+                      </option>
+                    ))
+                  )}
+                </Select>
+              </InputGroup>
             </FormControl>
 
-            <FormControl alignSelf="flex-end">
+            <HStack alignSelf="flex-end" spacing={3} w="100%">
               <Button
-                colorScheme="teal"
+                colorScheme={accentColor}
                 type="submit"
                 isLoading={isLoading}
                 loadingText="Filtering..."
                 width="100%"
+                leftIcon={<FaFilter />}
+                boxShadow="md"
+                _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
+                transition="all 0.2s"
               >
                 Apply Filters
               </Button>
-            </FormControl>
-          </SimpleGrid>
-        </Box>
-
-        <Grid
-          templateColumns={{
-            base: "repeat(1, 1fr)",
-            md: "repeat(2, 1fr)",
-            lg: "repeat(3, 1fr)",
-          }}
-          gap={6}
-        >
-          {renderClassCards()}
-        </Grid>
-
-        {totalPages > 1 && (
-          <Flex justify="center" mt={8}>
-            <HStack>
-              <IconButton
-                aria-label="Previous page"
-                icon={<ChevronLeftIcon />}
-                onClick={() => handleChangePage(filters.page - 1)}
-                isDisabled={filters.page <= 1 || isLoading}
-              />
-
-              <Text>
-                Page {filters.page} of {totalPages}
-              </Text>
-
-              <IconButton
-                aria-label="Next page"
-                icon={<ChevronRightIcon />}
-                onClick={() => handleChangePage(filters.page + 1)}
-                isDisabled={filters.page >= totalPages || isLoading}
-              />
+              <Tooltip label="Clear all filters">
+                <IconButton
+                  aria-label="Clear filters"
+                  icon={<Icon as={FaFilter} />}
+                  onClick={handleClearFilters}
+                  variant="outline"
+                  colorScheme={accentColor}
+                />
+              </Tooltip>
             </HStack>
-          </Flex>
-        )}
-      </Stack>
-    </Container>
+          </SimpleGrid>
+        </CardBody>
+      </MotionCard>
+
+      {/* Main Content - Class Cards */}
+      <SimpleGrid columns={{ base: 1, sm: 2, lg: 3, xl: 4 }} spacing={6} mb={8}>
+        {renderClassCards()}
+      </SimpleGrid>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <MotionFlex variants={itemVariants} justify="center" mt={4}>
+          <HStack spacing={2}>
+            <Button
+              leftIcon={<ChevronLeftIcon />}
+              onClick={() => handleChangePage(filters.page! - 1)}
+              isDisabled={filters.page === 1}
+              variant="outline"
+              colorScheme={accentColor}
+              size="sm"
+            >
+              Previous
+            </Button>
+            <Text fontWeight="medium" mx={2}>
+              Page {filters.page} of {totalPages}
+            </Text>
+            <Button
+              rightIcon={<ChevronRightIcon />}
+              onClick={() => handleChangePage(filters.page! + 1)}
+              isDisabled={filters.page === totalPages}
+              variant="outline"
+              colorScheme={accentColor}
+              size="sm"
+            >
+              Next
+            </Button>
+          </HStack>
+        </MotionFlex>
+      )}
+    </MotionBox>
   );
 };
 

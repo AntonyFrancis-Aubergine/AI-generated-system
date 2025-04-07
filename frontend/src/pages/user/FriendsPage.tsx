@@ -37,7 +37,7 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import { friendshipService, userService } from "../../services/api";
-import { Friendship, FriendshipStatus, User } from "../../types";
+import { Friendship, FriendshipStatus, User, UserRole } from "../../types";
 import FriendRequestList from "../../components/FriendRequestList";
 import FriendRequestButton from "../../components/FriendRequestButton";
 import * as toastUtils from "../../utils/toast";
@@ -70,7 +70,10 @@ const FriendsPage = () => {
       });
 
       if (response.success) {
-        setAcceptedFriendships(response.data.data);
+        // Ensure we have a defined array even if the API returns null/undefined
+        setAcceptedFriendships(response.data?.data || []);
+      } else {
+        setFriendshipsError(response.message || "Failed to fetch friends");
       }
     } catch (error) {
       const errorMessage =
@@ -105,7 +108,9 @@ const FriendsPage = () => {
             id: "user-" + Math.random().toString(36).substring(2, 9),
             name: searchEmail.split("@")[0], // Use part of email as mock name
             email: searchEmail,
-            role: "USER",
+            role: UserRole.USER,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           });
         } else {
           setSearchError("No user found with that email address");
@@ -164,20 +169,26 @@ const FriendsPage = () => {
               </Heading>
 
               {friendshipsError && (
-                <ErrorDisplay error={friendshipsError} mb={4} />
+                <Box mb={4}>
+                  <ErrorDisplay error={friendshipsError} />
+                </Box>
               )}
 
               {isLoadingFriendships ? (
                 <Text>Loading your friends...</Text>
-              ) : acceptedFriendships.length > 0 ? (
+              ) : acceptedFriendships && acceptedFriendships.length > 0 ? (
                 <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
                   {acceptedFriendships.map((friendship) => {
+                    if (!friendship) return null;
+
                     // Determine which user to show
                     const isCurrentUserSender =
-                      friendship.sender.id === user?.id;
+                      user && friendship?.sender?.id === user?.id;
                     const friend = isCurrentUserSender
-                      ? friendship.receiver
-                      : friendship.sender;
+                      ? friendship?.receiver
+                      : friendship?.sender;
+
+                    if (!friend) return null;
 
                     return (
                       <Card
@@ -212,7 +223,6 @@ const FriendsPage = () => {
                                 existingFriendship={friendship}
                                 onFriendshipUpdated={handleFriendshipUpdated}
                                 colorScheme="red"
-                                variant="outline"
                                 size="sm"
                                 width="full"
                               />
@@ -327,7 +337,11 @@ const FriendsPage = () => {
                 </Button>
               </form>
 
-              {searchError && <ErrorDisplay error={searchError} mb={4} />}
+              {searchError && (
+                <Box mb={4}>
+                  <ErrorDisplay error={searchError} />
+                </Box>
+              )}
 
               {foundUser && (
                 <Card borderWidth="1px" borderRadius="lg" mt={4}>
@@ -345,7 +359,6 @@ const FriendsPage = () => {
 
                       <FriendRequestButton
                         userId={foundUser.id}
-                        variant="button"
                         size="md"
                         onFriendshipUpdated={handleFriendshipUpdated}
                       />

@@ -531,7 +531,6 @@ const AdminDashboard = () => {
                       <Th>User</Th>
                       <Th>Role</Th>
                       <Th>Status</Th>
-                      <Th>Actions</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -548,9 +547,6 @@ const AdminDashboard = () => {
                               </Td>
                               <Td>
                                 <Skeleton height="24px" width="80px" />
-                              </Td>
-                              <Td>
-                                <Skeleton height="32px" width="100px" />
                               </Td>
                             </Tr>
                           ))
@@ -593,121 +589,11 @@ const AdminDashboard = () => {
                                 Active
                               </Badge>
                             </Td>
-                            <Td>
-                              <Menu>
-                                <MenuButton
-                                  as={Button}
-                                  variant="ghost"
-                                  size="sm"
-                                  rightIcon={<FaEllipsisV />}
-                                >
-                                  Actions
-                                </MenuButton>
-                                <MenuList>
-                                  <MenuItem icon={<FaPencilAlt />}>
-                                    Edit
-                                  </MenuItem>
-                                  <MenuItem icon={<FaCheckCircle />}>
-                                    Activate
-                                  </MenuItem>
-                                  <MenuItem
-                                    icon={<FaExclamationCircle />}
-                                    color="red.500"
-                                  >
-                                    Suspend
-                                  </MenuItem>
-                                </MenuList>
-                              </Menu>
-                            </Td>
                           </Tr>
                         ))}
                   </Tbody>
                 </Table>
               </TableContainer>
-            </CardBody>
-          </Card>
-
-          {/* Issues Needing Attention */}
-          <Card
-            bg={cardBg}
-            borderWidth="1px"
-            borderColor={cardBorder}
-            borderRadius="lg"
-            overflow="hidden"
-            transition="all 0.3s"
-            _hover={{ boxShadow: "md" }}
-          >
-            <CardHeader pb={0}>
-              <Heading size="md" mb={2} color={headingColor}>
-                Issues Needing Attention
-              </Heading>
-              <Text fontSize="sm" color={textColor}>
-                Reported problems requiring administrator action
-              </Text>
-            </CardHeader>
-            <CardBody>
-              <VStack spacing={4} align="stretch">
-                {issuesNeedingAttention.map((issue) => (
-                  <Box
-                    key={issue.id}
-                    p={4}
-                    borderWidth="1px"
-                    borderRadius="md"
-                    borderColor={cardBorder}
-                    bg={
-                      issue.priority === "High"
-                        ? redBg
-                        : issue.priority === "Medium"
-                        ? yellowBg
-                        : greenBg
-                    }
-                    _hover={{
-                      transform: "translateY(-2px)",
-                      boxShadow: "sm",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    <HStack justify="space-between" mb={2}>
-                      <HStack>
-                        <Icon
-                          as={FaExclamationTriangle}
-                          color={getSeverityColor(issue.priority) + ".500"}
-                        />
-                        <Heading size="sm">{issue.title}</Heading>
-                      </HStack>
-                      <Badge
-                        colorScheme={getSeverityColor(issue.priority)}
-                        borderRadius="full"
-                        px={2}
-                      >
-                        {issue.priority}
-                      </Badge>
-                    </HStack>
-                    <Text fontSize="sm" mb={2}>
-                      {issue.description}
-                    </Text>
-                    <Text fontSize="xs" color={textColor}>
-                      Reported on {issue.reported}
-                    </Text>
-                  </Box>
-                ))}
-
-                <Button
-                  as={RouterLink}
-                  to="/admin/issues"
-                  colorScheme="purple"
-                  bgGradient={buttonBgGradient}
-                  color="white"
-                  _hover={{
-                    bgGradient: buttonHoverBgGradient,
-                    transform: "translateY(-2px)",
-                    boxShadow: "md",
-                  }}
-                  leftIcon={<FaExclamationCircle />}
-                >
-                  View All Issues
-                </Button>
-              </VStack>
             </CardBody>
           </Card>
         </MotionBox>

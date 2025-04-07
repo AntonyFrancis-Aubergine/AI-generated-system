@@ -1,8 +1,22 @@
-import { Router } from 'express'
-import { UserController } from '../../controllers'
-import { authenticate, isSelfOrAdmin } from '../../middlewares/auth.middleware'
+import { Router } from "express";
+import { UserController } from "../../controllers";
+import { authenticate, isSelfOrAdmin } from "../../middlewares/auth.middleware";
 
-const userRouter = Router()
+const userRouter = Router();
+
+/**
+ * @route GET /api/v1/users/instructors
+ * @desc Get all users with instructor role
+ * @access Authenticated users
+ */
+userRouter.get("/instructors", authenticate, UserController.getInstructors);
+
+/**
+ * @route GET /api/v1/users/activity
+ * @desc Get recent activity for the authenticated user
+ * @access Authenticated users
+ */
+userRouter.get("/activity", authenticate, UserController.getUserActivity);
 
 /**
  * @route GET /api/v1/users/:userId
@@ -10,10 +24,10 @@ const userRouter = Router()
  * @access Authenticated users (admin or the user themselves)
  */
 userRouter.get(
-  '/:userId',
+  "/:userId",
   authenticate,
   isSelfOrAdmin,
   UserController.getUserById
-)
+);
 
-export default userRouter
+export default userRouter;

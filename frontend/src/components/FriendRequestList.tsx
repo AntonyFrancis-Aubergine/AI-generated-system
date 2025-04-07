@@ -24,6 +24,7 @@ import { friendshipService } from "../services/api";
 import { Friendship, FriendshipStatus } from "../types";
 import * as toastUtils from "../utils/toast";
 import ErrorDisplay from "./ErrorDisplay";
+import { useAuth } from "../context/AuthContext";
 
 interface FriendRequestListProps {
   variant?: "pendingOnly" | "all";
@@ -41,6 +42,7 @@ const FriendRequestList = ({
   const [friendships, setFriendships] = useState<Friendship[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
   const toast = useToast();
 
   const fetchFriendRequests = async () => {
@@ -159,12 +161,15 @@ const FriendRequestList = ({
   };
 
   const renderFriendshipItem = (friendship: Friendship) => {
+    if (!friendship || !user) return null;
+
     // Determine which user to show (the other person in the friendship)
-    const isCurrentUserSender =
-      friendship.sender.id === localStorage.getItem("userId");
+    const isCurrentUserSender = friendship.sender?.id === user?.id;
     const otherUser = isCurrentUserSender
       ? friendship.receiver
       : friendship.sender;
+
+    if (!otherUser) return null;
 
     return (
       <Box key={friendship.id} w="100%">

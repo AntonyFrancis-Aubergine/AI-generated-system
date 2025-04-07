@@ -23,15 +23,9 @@ export const registerSchema = z
     adminCode: z.string().optional(),
   })
   .refine(
-    (data) => {
-      // If role is ADMIN, adminCode is required
-      if (data.role === CONSTANTS.AUTH.ROLES.ADMIN) {
-        return data.adminCode !== undefined && data.adminCode.trim() !== "";
-      }
-      return true;
-    },
+    () => true, // Always pass this refinement - adminCode is not required
     {
-      message: "Admin authorization code is required for admin registration",
+      message: "Admin authorization code is not required anymore",
       path: ["adminCode"],
     }
   );

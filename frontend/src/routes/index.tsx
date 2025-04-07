@@ -49,10 +49,10 @@ const userRoutes: RouteObject[] = [
         path: "bookings",
         element: <UserBookings />,
       },
-      {
-        path: "friends",
-        element: <FriendsPage />,
-      },
+      // {
+      //   path: "friends",
+      //   element: <FriendsPage />,
+      // },
     ],
   },
 ];
