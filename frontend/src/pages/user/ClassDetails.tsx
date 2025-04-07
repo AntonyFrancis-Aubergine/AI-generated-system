@@ -18,16 +18,27 @@ import {
   GridItem,
   Icon,
   HStack,
+  useColorModeValue,
+  Tag,
+  VStack,
 } from '@chakra-ui/react'
-import {
-  ChevronLeftIcon,
-  CalendarIcon,
-  TimeIcon,
-  InfoIcon,
-} from '@chakra-ui/icons'
+import { ChevronLeftIcon, InfoIcon } from '@chakra-ui/icons'
 import { format } from 'date-fns'
+import { motion } from 'framer-motion'
 import { fitnessClassService } from '../../services/api'
 import { FitnessClass } from '../../types'
+import {
+  FaCalendarAlt,
+  FaClock,
+  FaUser,
+  FaMapMarkerAlt,
+  FaDumbbell,
+} from 'react-icons/fa'
+
+// Create motion components
+const MotionBox = motion(Box)
+const MotionCard = motion(Card)
+const MotionContainer = motion(Container)
 
 const ClassDetails = () => {
   const { classId } = useParams<{ classId: string }>()
@@ -37,6 +48,14 @@ const ClassDetails = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isBooking, setIsBooking] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Color mode values
+  const cardBg = useColorModeValue('white', 'gray.800')
+  const headerBg = useColorModeValue('brand.50', 'brand.900')
+  const errorBg = useColorModeValue('red.50', 'rgba(200, 50, 50, 0.2)')
+  const textColor = useColorModeValue('neutral.800', 'white')
+  const secondaryTextColor = useColorModeValue('neutral.600', 'neutral.300')
+  const borderColor = useColorModeValue('neutral.100', 'gray.700')
 
   useEffect(() => {
     const fetchClassDetails = async () => {
@@ -111,7 +130,7 @@ const ClassDetails = () => {
     return (
       <Container maxW="container.md" py={10}>
         <Flex justifyContent="center" alignItems="center" height="300px">
-          <Spinner size="xl" color="teal.500" />
+          <Spinner size="xl" color="brand.500" thickness="4px" />
         </Flex>
       </Container>
     )
@@ -120,14 +139,24 @@ const ClassDetails = () => {
   if (error || !fitnessClass) {
     return (
       <Container maxW="container.md" py={10}>
-        <Box textAlign="center" p={10} borderRadius="md" bg="red.50">
+        <Box
+          textAlign="center"
+          p={10}
+          borderRadius="lg"
+          bg={errorBg}
+          borderWidth="1px"
+          borderColor="red.200"
+        >
+          <Icon as={FaDumbbell} boxSize={12} color="red.500" mb={4} />
           <Heading size="md" color="red.500" mb={4}>
             {error || 'Class not found'}
           </Heading>
           <Button
             leftIcon={<ChevronLeftIcon />}
-            colorScheme="teal"
+            colorScheme="brand"
             onClick={() => navigate('/classes')}
+            _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+            transition="all 0.2s"
           >
             Back to Classes
           </Button>
@@ -137,94 +166,220 @@ const ClassDetails = () => {
   }
 
   return (
-    <Container maxW="container.md" py={10}>
-      <Button
-        leftIcon={<ChevronLeftIcon />}
-        variant="ghost"
-        mb={4}
-        onClick={() => navigate('/classes')}
+    <MotionContainer
+      maxW="container.md"
+      py={10}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <MotionBox
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
       >
-        Back to Classes
-      </Button>
+        <Button
+          leftIcon={<ChevronLeftIcon />}
+          variant="ghost"
+          mb={6}
+          onClick={() => navigate('/classes')}
+          color="brand.500"
+          _hover={{ bg: 'brand.50' }}
+        >
+          Back to Classes
+        </Button>
+      </MotionBox>
 
-      <Card borderRadius="lg" overflow="hidden" boxShadow="lg">
-        <Box bg="teal.50" p={6}>
-          <Heading as="h1" size="xl" mb={2}>
+      <MotionCard
+        borderRadius="xl"
+        overflow="hidden"
+        boxShadow="lg"
+        bg={cardBg}
+        borderWidth="1px"
+        borderColor={borderColor}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <Box bg={headerBg} p={8}>
+          <Heading as="h1" size="xl" mb={3} color="brand.700">
             {fitnessClass.name}
           </Heading>
 
-          <HStack spacing={2} mb={2}>
+          <HStack spacing={3} mb={3}>
             {fitnessClass.category && (
-              <Badge colorScheme="teal" fontSize="sm">
+              <Badge
+                colorScheme="brand"
+                px={3}
+                py={1}
+                borderRadius="full"
+                fontSize="sm"
+              >
                 {fitnessClass.category.name}
               </Badge>
             )}
+            <Tag size="md" colorScheme="accent" borderRadius="full" px={3}>
+              Limited Spots
+            </Tag>
           </HStack>
+
+          <Text color={secondaryTextColor} fontSize="md">
+            Join us for this exciting fitness class designed to help you reach
+            your fitness goals.
+          </Text>
         </Box>
 
-        <Divider />
+        <Divider borderColor={borderColor} />
 
-        <CardBody>
-          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6}>
+        <CardBody py={8}>
+          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={8}>
             <GridItem>
-              <Stack spacing={4}>
-                <Flex align="center">
-                  <Icon as={CalendarIcon} color="teal.500" mr={2} />
-                  <Box>
-                    <Text fontWeight="bold">Date</Text>
-                    <Text>
-                      {format(
-                        new Date(fitnessClass.startsAt),
-                        'EEEE, MMMM dd, yyyy'
-                      )}
-                    </Text>
-                  </Box>
-                </Flex>
+              <VStack spacing={6} align="stretch">
+                <MotionBox
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.3 }}
+                >
+                  <Flex align="center">
+                    <Icon
+                      as={FaCalendarAlt}
+                      color="brand.500"
+                      boxSize={5}
+                      mr={4}
+                    />
+                    <Box>
+                      <Text
+                        fontWeight="semibold"
+                        fontSize="lg"
+                        color={textColor}
+                      >
+                        Date
+                      </Text>
+                      <Text color={secondaryTextColor}>
+                        {format(
+                          new Date(fitnessClass.startsAt),
+                          'EEEE, MMMM dd, yyyy'
+                        )}
+                      </Text>
+                    </Box>
+                  </Flex>
+                </MotionBox>
 
-                <Flex align="center">
-                  <Icon as={TimeIcon} color="teal.500" mr={2} />
-                  <Box>
-                    <Text fontWeight="bold">Time</Text>
-                    <Text>
-                      {format(new Date(fitnessClass.startsAt), 'h:mm a')} -{' '}
-                      {format(new Date(fitnessClass.endsAt), 'h:mm a')}
-                    </Text>
-                  </Box>
-                </Flex>
-              </Stack>
+                <MotionBox
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.4 }}
+                >
+                  <Flex align="center">
+                    <Icon as={FaClock} color="brand.500" boxSize={5} mr={4} />
+                    <Box>
+                      <Text
+                        fontWeight="semibold"
+                        fontSize="lg"
+                        color={textColor}
+                      >
+                        Time
+                      </Text>
+                      <Text color={secondaryTextColor}>
+                        {format(new Date(fitnessClass.startsAt), 'h:mm a')} -{' '}
+                        {format(new Date(fitnessClass.endsAt), 'h:mm a')}
+                      </Text>
+                    </Box>
+                  </Flex>
+                </MotionBox>
+              </VStack>
             </GridItem>
 
             <GridItem>
-              <Stack spacing={4}>
-                <Flex align="center">
-                  <Icon as={InfoIcon} color="teal.500" mr={2} />
-                  <Box>
-                    <Text fontWeight="bold">Instructor</Text>
-                    <Text>
-                      {fitnessClass.instructor?.name || 'Not specified'}
-                    </Text>
-                  </Box>
-                </Flex>
-              </Stack>
+              <VStack spacing={6} align="stretch">
+                <MotionBox
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.5 }}
+                >
+                  <Flex align="center">
+                    <Icon as={FaUser} color="accent.500" boxSize={5} mr={4} />
+                    <Box>
+                      <Text
+                        fontWeight="semibold"
+                        fontSize="lg"
+                        color={textColor}
+                      >
+                        Instructor
+                      </Text>
+                      <Text color={secondaryTextColor}>
+                        {fitnessClass.instructor?.name || 'Not specified'}
+                      </Text>
+                    </Box>
+                  </Flex>
+                </MotionBox>
+
+                <MotionBox
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.6 }}
+                >
+                  <Flex align="center">
+                    <Icon
+                      as={FaMapMarkerAlt}
+                      color="accent.500"
+                      boxSize={5}
+                      mr={4}
+                    />
+                    <Box>
+                      <Text
+                        fontWeight="semibold"
+                        fontSize="lg"
+                        color={textColor}
+                      >
+                        Location
+                      </Text>
+                      <Text color={secondaryTextColor}>
+                        Main Fitness Studio
+                      </Text>
+                    </Box>
+                  </Flex>
+                </MotionBox>
+              </VStack>
             </GridItem>
           </Grid>
+
+          <MotionBox
+            mt={8}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+          >
+            <Text fontWeight="semibold" fontSize="lg" mb={2} color={textColor}>
+              About this class
+            </Text>
+            <Text color={secondaryTextColor}>
+              This class is designed to help you improve your fitness level and
+              achieve your health goals.
+            </Text>
+          </MotionBox>
         </CardBody>
 
-        <Divider />
+        <Divider borderColor={borderColor} />
 
-        <Box p={6}>
+        <Box p={8}>
           <Button
-            colorScheme="teal"
+            colorScheme="brand"
             size="lg"
             width="100%"
+            height="60px"
+            fontSize="md"
             onClick={handleBookClass}
             isLoading={isBooking}
+            _hover={{ transform: 'translateY(-2px)', boxShadow: 'lg' }}
+            transition="all 0.2s"
+            borderRadius="lg"
           >
-            Book Now
+            Book This Class
           </Button>
         </Box>
-      </Card>
-    </Container>
+      </MotionCard>
+    </MotionContainer>
   )
 }
 

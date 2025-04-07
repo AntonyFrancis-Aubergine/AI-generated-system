@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Link as RouterLink } from 'react-router-dom'
+import { useNavigate, Link as RouterLink, useLocation } from 'react-router-dom'
 import {
   Button,
   FormControl,
@@ -20,7 +20,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAuth } from '../../context/AuthContext'
-import { LoginRequest } from '../../types'
+import { LoginRequest, UserRole } from '../../types'
 
 // Login form validation schema
 const loginSchema = z.object({
@@ -36,6 +36,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const {
     register,
@@ -50,7 +51,37 @@ const Login = () => {
       setIsLoading(true)
       setError(null)
       await login(data as LoginRequest)
-      navigate('/')
+
+      // Get the user from localStorage after login
+      const userString = localStorage.getItem('user')
+      if (userString) {
+        const user = JSON.parse(userString)
+
+        // Redirect based on user role
+        const from = location.state?.from?.pathname
+
+        if (from && from !== '/') {
+          // If coming from a specific page, go back there
+          navigate(from)
+        } else {
+          // Otherwise redirect to role-specific dashboard
+          switch (user.role) {
+            case UserRole.ADMIN:
+              navigate('/admin/dashboard')
+              break
+            case UserRole.INSTRUCTOR:
+              navigate('/instructor/dashboard')
+              break
+            case UserRole.USER:
+              navigate('/user/dashboard')
+              break
+            default:
+              navigate('/dashboard')
+          }
+        }
+      } else {
+        navigate('/dashboard')
+      }
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.message ||

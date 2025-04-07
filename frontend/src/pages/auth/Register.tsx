@@ -78,7 +78,29 @@ const Register = () => {
       setIsLoading(true)
       setError(null)
       await registerUser(data as RegisterRequest)
-      navigate('/')
+
+      // Get the user from localStorage after registration
+      const userString = localStorage.getItem('user')
+      if (userString) {
+        const user = JSON.parse(userString)
+
+        // Redirect based on user role
+        switch (user.role) {
+          case 'ADMIN':
+            navigate('/admin/dashboard')
+            break
+          case 'INSTRUCTOR':
+            navigate('/instructor/dashboard')
+            break
+          case 'USER':
+            navigate('/user/dashboard')
+            break
+          default:
+            navigate('/dashboard')
+        }
+      } else {
+        navigate('/dashboard')
+      }
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.message ||

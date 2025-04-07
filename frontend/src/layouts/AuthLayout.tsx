@@ -1,4 +1,4 @@
-import { Outlet, Link } from 'react-router-dom'
+import { Outlet, Link as RouterLink } from 'react-router-dom'
 import {
   Box,
   Flex,
@@ -7,14 +7,32 @@ import {
   useColorModeValue,
   IconButton,
   useColorMode,
+  Button,
+  Text,
+  HStack,
+  Icon,
 } from '@chakra-ui/react'
-import { SunIcon, MoonIcon } from '@chakra-ui/icons'
+import { SunIcon, MoonIcon, ArrowBackIcon } from '@chakra-ui/icons'
+import { FaDumbbell } from 'react-icons/fa'
 
 const AuthLayout = () => {
   const { colorMode, toggleColorMode } = useColorMode()
+  const brandColor = useColorModeValue('brand.500', 'brand.300')
 
   return (
     <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>
+      <Flex position="absolute" top={4} left={4} align="center">
+        <Button
+          as={RouterLink}
+          to="/"
+          leftIcon={<ArrowBackIcon />}
+          variant="ghost"
+          size="sm"
+        >
+          Back to Home
+        </Button>
+      </Flex>
+
       <Flex position="absolute" top={4} right={4}>
         <IconButton
           icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
@@ -25,15 +43,21 @@ const AuthLayout = () => {
       </Flex>
       <Container maxW="lg" py={{ base: 12, md: 20 }}>
         <Flex direction="column" align="center" mb={8}>
-          <Link to="/">
-            <Heading
-              size="xl"
-              mb={2}
-              color={useColorModeValue('teal.600', 'teal.300')}
-            >
-              FitBook
-            </Heading>
-          </Link>
+          <RouterLink to="/">
+            <HStack spacing={2} mb={2}>
+              <Box bg={brandColor} color="white" p={1} borderRadius="md">
+                <Icon as={FaDumbbell} boxSize={6} />
+              </Box>
+              <Heading
+                size="xl"
+                color={brandColor}
+                bgGradient={`linear(to-r, brand.500, accent.500)`}
+                bgClip="text"
+              >
+                FitBook
+              </Heading>
+            </HStack>
+          </RouterLink>
           <Heading
             size="md"
             textAlign="center"

@@ -9,6 +9,7 @@ import { lazy, Suspense } from 'react'
 import { AuthProvider } from './context/AuthContext'
 import MainLayout from './layouts/MainLayout'
 import AuthLayout from './layouts/AuthLayout'
+import PublicLayout from './layouts/PublicLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import theme from './utils/theme'
 import Loading from './components/Loading'
@@ -17,6 +18,9 @@ import ClassDetails from './pages/user/ClassDetails'
 // Auth pages
 const Login = lazy(() => import('./pages/auth/Login'))
 const Register = lazy(() => import('./pages/auth/Register'))
+
+// Landing page
+const LandingPage = lazy(() => import('./pages/LandingPage'))
 
 // User pages
 const ClassList = lazy(() => import('./pages/user/ClassList'))
@@ -45,6 +49,11 @@ function App() {
         <Router>
           <Suspense fallback={<Loading />}>
             <Routes>
+              {/* Public landing page */}
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<LandingPage />} />
+              </Route>
+
               {/* Auth routes */}
               <Route element={<AuthLayout />}>
                 <Route path="/login" element={<Login />} />
@@ -54,8 +63,11 @@ function App() {
               {/* Protected routes */}
               <Route element={<ProtectedRoute />}>
                 <Route element={<MainLayout />}>
-                  {/* Common routes */}
-                  <Route path="/" element={<Home />} />
+                  {/* Dashboard routes - using Home component temporarily */}
+                  <Route path="/dashboard" element={<Home />} />
+                  <Route path="/user/dashboard" element={<Home />} />
+                  <Route path="/admin/dashboard" element={<Home />} />
+                  <Route path="/instructor/dashboard" element={<Home />} />
 
                   {/* User routes */}
                   <Route path="/classes" element={<ClassList />} />
