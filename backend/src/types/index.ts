@@ -3,6 +3,7 @@ export * as AuthTypes from './auth.types'
 export * as FitnessClassTypes from './fitnessClass.types'
 export * as BookingTypes from './fitnessClassBooking.types'
 export * as InstructorTypes from './instructor.types'
+export * as ReviewTypes from './fitnessClassReview.types'
 
 export interface Pagination {
   page: number

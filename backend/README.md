@@ -131,6 +131,30 @@ A Postman collection is included in the project root (`postman_collection.json`)
     - `page` - Page number (default: 1)
     - `limit` - Items per page (default: 10)
 
+#### Reviews
+
+- `POST /api/v1/reviews` - Submit a review for a fitness class
+  - Requires authentication
+  - User must have booked the class
+  - Class must have already ended
+  - Request body parameters:
+    - `fitnessClassId` - ID of the fitness class to review (required)
+    - `rating` - Rating between 1-5 stars (required)
+    - `feedback` - Text feedback (optional)
+  - Only one review per user per class is allowed
+- `GET /api/v1/reviews/classes/:fitnessClassId` - Get all reviews for a fitness class
+  - Requires authentication
+  - Returns paginated list of reviews with user details
+  - Query parameters:
+    - `page` - Page number (default: 1)
+    - `limit` - Items per page (default: 10)
+- `GET /api/v1/reviews/classes/:fitnessClassId/summary` - Get rating summary for a fitness class
+  - Requires authentication
+  - Returns average rating and distribution of ratings
+- `GET /api/v1/reviews/classes/:fitnessClassId/user` - Get the current user's review for a fitness class
+  - Requires authentication
+  - Returns the authenticated user's review for the specified class
+
 #### Instructor Endpoints
 
 - `GET /api/v1/instructors/classes` - Get all classes for which the authenticated user is an instructor

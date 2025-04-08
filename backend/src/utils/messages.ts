@@ -88,4 +88,14 @@ export const MESSAGES = {
     CLASS_TOO_SOON: 'Cannot book a class that starts in less than 1 hour',
     CLASS_FULL: 'This fitness class is already at full capacity',
   },
+
+  REVIEW: {
+    CREATED: 'Review submitted successfully',
+    UPDATED: 'Review updated successfully',
+    DELETED: 'Review deleted successfully',
+    EXISTS: 'You have already reviewed this fitness class',
+    NOT_BOOKED: 'You cannot review a class you have not booked',
+    CLASS_NOT_ENDED: 'You can only review a class after it has ended',
+    INVALID_RATING: 'Rating must be between 1 and 5 stars',
+  },
 }
