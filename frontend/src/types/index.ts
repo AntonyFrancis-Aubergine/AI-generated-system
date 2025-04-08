@@ -68,6 +68,7 @@ export interface FitnessClass {
   capacity: number;
   createdAt: string;
   updatedAt: string;
+  bookings?: Booking[];
 }
 
 export interface Category {

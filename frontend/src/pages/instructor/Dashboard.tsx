@@ -28,6 +28,10 @@ import {
   TableContainer,
   Divider,
   Avatar,
+  Spinner,
+  Tooltip,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 import {
   FaUsers,
@@ -36,10 +40,16 @@ import {
   FaCalendarAlt,
   FaChartLine,
   FaClock,
+  FaExclamationCircle,
+  FaCheckCircle,
 } from "react-icons/fa";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { Link as RouterLink } from "react-router-dom";
+import { instructorService } from "../../services/api";
+import { FitnessClass } from "../../types";
+import { format, isBefore, isToday, isTomorrow, addDays } from "date-fns";
 
 // Create motion components
 const MotionBox = motion(Box);
@@ -69,6 +79,9 @@ const itemVariants = {
 
 const InstructorDashboard = () => {
   const { user } = useAuth();
+  const [upcomingClasses, setUpcomingClasses] = useState<FitnessClass[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Theme colors
   const cardBg = useColorModeValue("white", "gray.800");
@@ -82,39 +95,122 @@ const InstructorDashboard = () => {
   const buttonBgGradient = "linear(to-r, purple.600, pink.500)";
   const buttonHoverBgGradient = "linear(to-r, purple.700, pink.600)";
 
+  // Fetch instructor's classes
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        // Verify the user is an instructor
+        if (!user || user.role !== "INSTRUCTOR") {
+          setError("Only instructors can view this dashboard");
+          setIsLoading(false);
+          return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+        const response = await instructorService.getInstructorClasses(1, 5);
+
+        if (response.success) {
+          // Sort by start date (closest first)
+          const sortedClasses = response.data.data.sort(
+            (a, b) =>
+              new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
+          );
+
+          // Only include future classes
+          const futureClasses = sortedClasses.filter(
+            (c) => new Date(c.startsAt) > new Date()
+          );
+
+          setUpcomingClasses(futureClasses.slice(0, 3)); // Take first 3 upcoming classes
+        } else {
+          setError(response.message || "Failed to load classes");
+        }
+      } catch (err) {
+        console.error("Dashboard error:", err);
+        if (err instanceof Error) {
+          setError(`Error: ${err.message}`);
+        } else {
+          setError("An unknown error occurred");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchClasses();
+  }, [user]);
+
+  // Format date for display
+  const formatClassTime = (dateString: string) => {
+    const date = new Date(dateString);
+    let dayText = "";
+
+    if (isToday(date)) {
+      dayText = "Today";
+    } else if (isTomorrow(date)) {
+      dayText = "Tomorrow";
+    } else {
+      dayText = format(date, "MMM dd");
+    }
+
+    return `${dayText}, ${format(date, "h:mm a")}`;
+  };
+
+  // Calculate class duration in minutes
+  const getClassDuration = (startsAt: string, endsAt: string) => {
+    const start = new Date(startsAt);
+    const end = new Date(endsAt);
+    const durationMs = end.getTime() - start.getTime();
+    const durationMinutes = Math.round(durationMs / (1000 * 60));
+    return `${durationMinutes} min`;
+  };
+
+  // Calculate the number of bookings for a class (bookings array length)
+  const getEnrolledCount = (fitnessClass: FitnessClass) => {
+    return fitnessClass.bookings?.length || 0; // Use optional chaining
+  };
+
+  // Get capacity status and color
+  const getCapacityStatus = (enrolled: number, capacity: number) => {
+    const percentage = (enrolled / capacity) * 100;
+
+    if (percentage >= 100) {
+      return {
+        color: "red",
+        icon: FaExclamationCircle,
+        text: "Full",
+        colorScheme: "red",
+      };
+    } else if (percentage >= 80) {
+      return {
+        color: "orange",
+        icon: FaExclamationCircle,
+        text: "Nearly Full",
+        colorScheme: "orange",
+      };
+    } else if (percentage >= 50) {
+      return {
+        color: "yellow",
+        icon: null,
+        text: "Filling Up",
+        colorScheme: "yellow",
+      };
+    } else {
+      return {
+        color: "green",
+        icon: FaCheckCircle,
+        text: "Available",
+        colorScheme: "green",
+      };
+    }
+  };
+
   // Mock data
   const totalStudents = 78;
   const activeClasses = 5;
   const averageRating = 4.8;
   const bookingRate = 94;
-
-  // Upcoming classes data (would come from API)
-  const upcomingClasses = [
-    {
-      id: 1,
-      title: "Power Yoga",
-      time: "Today, 9:00 AM",
-      duration: "60 min",
-      enrolled: 12,
-      capacity: 15,
-    },
-    {
-      id: 2,
-      title: "HIIT Workout",
-      time: "Tomorrow, 10:00 AM",
-      duration: "45 min",
-      enrolled: 18,
-      capacity: 20,
-    },
-    {
-      id: 3,
-      title: "Pilates Foundations",
-      time: "Aug 18, 2:00 PM",
-      duration: "60 min",
-      enrolled: 8,
-      capacity: 15,
-    },
-  ];
 
   // Student data
   const topStudents = [
@@ -228,7 +324,7 @@ const InstructorDashboard = () => {
                   Your schedule for the next few days
                 </Text>
               </Box>
-              <Button
+              {/* <Button
                 as={RouterLink}
                 to="/instructor/classes"
                 variant="outline"
@@ -237,59 +333,142 @@ const InstructorDashboard = () => {
                 size="sm"
               >
                 All Classes
-              </Button>
+              </Button> */}
             </CardHeader>
             <CardBody>
-              <VStack spacing={4} align="stretch">
-                {upcomingClasses.map((classItem) => (
-                  <Box
-                    key={classItem.id}
-                    p={4}
-                    borderWidth="1px"
-                    borderRadius="md"
-                    borderColor={cardBorder}
-                    _hover={{
-                      bg: useColorModeValue("gray.50", "gray.700"),
-                      transform: "translateY(-2px)",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    <HStack justify="space-between" mb={3}>
-                      <Heading size="sm">{classItem.title}</Heading>
-                      <HStack>
-                        <Icon as={FaClock} color="purple.500" />
-                        <Text fontSize="sm" fontWeight="medium">
-                          {classItem.duration}
-                        </Text>
-                      </HStack>
-                    </HStack>
+              {isLoading ? (
+                <Flex justify="center" align="center" py={10}>
+                  <Spinner color="purple.500" size="xl" thickness="4px" />
+                </Flex>
+              ) : error ? (
+                <Alert status="error" borderRadius="md" my={4}>
+                  <AlertIcon />
+                  <Text>{error}</Text>
+                </Alert>
+              ) : upcomingClasses.length === 0 ? (
+                <Box
+                  p={6}
+                  textAlign="center"
+                  borderWidth="1px"
+                  borderRadius="md"
+                  borderColor={cardBorder}
+                  borderStyle="dashed"
+                >
+                  <Icon
+                    as={FaCalendarAlt}
+                    boxSize={8}
+                    color="purple.500"
+                    mb={3}
+                  />
+                  <Text fontWeight="medium" mb={2}>
+                    No upcoming classes
+                  </Text>
+                  <Text fontSize="sm" color={textColor}>
+                    You don't have any classes scheduled for the near future.
+                  </Text>
+                </Box>
+              ) : (
+                <VStack spacing={4} align="stretch">
+                  {upcomingClasses.map((classItem) => {
+                    const enrolled = getEnrolledCount(classItem);
+                    const capacityStatus = getCapacityStatus(
+                      enrolled,
+                      classItem.capacity
+                    );
 
-                    <Text fontSize="sm" color={textColor} mb={3}>
-                      {classItem.time}
-                    </Text>
+                    return (
+                      <Box
+                        key={classItem.id}
+                        p={4}
+                        borderWidth="1px"
+                        borderRadius="md"
+                        borderColor={cardBorder}
+                        _hover={{
+                          bg: useColorModeValue("gray.50", "gray.700"),
+                          transform: "translateY(-2px)",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        <HStack justify="space-between" mb={3}>
+                          <Heading size="sm">{classItem.name}</Heading>
+                          <HStack>
+                            <Icon as={FaClock} color="purple.500" />
+                            <Text fontSize="sm" fontWeight="medium">
+                              {getClassDuration(
+                                classItem.startsAt,
+                                classItem.endsAt
+                              )}
+                            </Text>
+                          </HStack>
+                        </HStack>
 
-                    <Box>
-                      <HStack justify="space-between" mb={1}>
-                        <Text fontSize="xs" fontWeight="medium">
-                          {classItem.enrolled}/{classItem.capacity} students
+                        <Text fontSize="sm" color={textColor} mb={3}>
+                          {formatClassTime(classItem.startsAt)}
                         </Text>
-                        <Text fontSize="xs" fontWeight="medium">
-                          {Math.round(
-                            (classItem.enrolled / classItem.capacity) * 100
+
+                        <Box>
+                          {/* Show warning if bookings data isn't available */}
+                          {classItem.bookings === undefined ? (
+                            <Tooltip label="Booking data is not available. Showing capacity only.">
+                              <HStack color="yellow.500" mb={2} fontSize="xs">
+                                <Icon as={FaExclamationCircle} />
+                                <Text>Capacity: {classItem.capacity}</Text>
+                              </HStack>
+                            </Tooltip>
+                          ) : (
+                            <>
+                              <HStack justify="space-between" mb={1}>
+                                <HStack>
+                                  <Text fontSize="xs" fontWeight="medium">
+                                    {enrolled}/{classItem.capacity} students
+                                  </Text>
+                                  <Tooltip
+                                    label={`${capacityStatus.text}: ${enrolled} out of ${classItem.capacity} spots filled`}
+                                    placement="top"
+                                  >
+                                    <Badge
+                                      colorScheme={capacityStatus.colorScheme}
+                                      borderRadius="full"
+                                      display="flex"
+                                      alignItems="center"
+                                      px={2}
+                                      py={0.5}
+                                    >
+                                      {capacityStatus.icon && (
+                                        <Icon
+                                          as={capacityStatus.icon}
+                                          boxSize={2.5}
+                                          mr={1}
+                                        />
+                                      )}
+                                      {capacityStatus.text}
+                                    </Badge>
+                                  </Tooltip>
+                                </HStack>
+                                <Text fontSize="xs" fontWeight="medium">
+                                  {Math.round(
+                                    (enrolled / classItem.capacity) * 100
+                                  )}
+                                  %
+                                </Text>
+                              </HStack>
+                              <Progress
+                                value={(enrolled / classItem.capacity) * 100}
+                                size="sm"
+                                colorScheme={capacityStatus.colorScheme}
+                                borderRadius="full"
+                              />
+                              <Text fontSize="xs" mt={1} color={textColor}>
+                                {classItem.capacity - enrolled} spots remaining
+                              </Text>
+                            </>
                           )}
-                          %
-                        </Text>
-                      </HStack>
-                      <Progress
-                        value={(classItem.enrolled / classItem.capacity) * 100}
-                        size="sm"
-                        colorScheme="purple"
-                        borderRadius="full"
-                      />
-                    </Box>
-                  </Box>
-                ))}
-              </VStack>
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </VStack>
+              )}
             </CardBody>
           </Card>
 

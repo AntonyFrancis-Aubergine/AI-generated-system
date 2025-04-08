@@ -98,7 +98,16 @@ const configureInterceptors = (instance: AxiosInstance): void => {
       const token = localStorage.getItem("token");
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log("Setting auth header with token");
+        console.log(
+          "Setting auth header with token:",
+          token.substring(0, 10) + "..."
+        );
+        console.log("API request to:", config.baseURL + config.url);
+      } else {
+        console.warn(
+          "No token found for API request to:",
+          config.baseURL + config.url
+        );
       }
     } catch (error) {
       console.error("Error accessing localStorage:", error);
@@ -109,7 +118,16 @@ const configureInterceptors = (instance: AxiosInstance): void => {
   // Response interceptor
   instance.interceptors.response.use(
     (response) => response,
-    (error) => Promise.reject(error)
+    (error) => {
+      if (axios.isAxiosError(error) && error.response) {
+        console.error("API error response:", {
+          status: error.response.status,
+          url: error.config?.url,
+          data: error.response.data,
+        });
+      }
+      return Promise.reject(error);
+    }
   );
 };
 
@@ -459,13 +477,18 @@ export const instructorService = {
     limit = 10
   ): Promise<ApiResponse<PaginatedResponse<FitnessClass>>> => {
     try {
+      console.log("Fetching instructor classes with params:", { page, limit });
+
       const response = await api.get<
         ApiResponse<PaginatedResponse<FitnessClass>>
       >("/instructors/classes", {
         params: { page, limit },
       });
+
+      console.log("Instructor classes response:", response);
       return response.data;
     } catch (error) {
+      console.error("Error fetching instructor classes:", error);
       throw handleApiError(error);
     }
   },
