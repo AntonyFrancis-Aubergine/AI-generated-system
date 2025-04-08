@@ -176,7 +176,13 @@ const MainLayout = () => {
   const logoSize = useBreakpointValue({ base: "md", md: "lg" });
 
   return (
-    <Box minH="100vh" display="flex" flexDirection="column">
+    <Box
+      minH="100vh"
+      display="flex"
+      flexDirection="column"
+      bg={useColorModeValue("white", "gray.900")}
+      position="relative"
+    >
       <MotionFlex
         as="header"
         position="fixed"

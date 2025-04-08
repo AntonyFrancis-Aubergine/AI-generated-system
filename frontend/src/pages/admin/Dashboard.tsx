@@ -406,7 +406,8 @@ const AdminDashboard = () => {
             <Skeleton height="36px" width="80%" mt={2} mb={2} />
           ) : (
             <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
-              ${dashboardData.revenue}
+              coming soon
+              {/* ${dashboardData.revenue} */}
             </StatNumber>
           )}
           <StatHelpText>For current month</StatHelpText>
@@ -428,7 +429,8 @@ const AdminDashboard = () => {
             <Skeleton height="36px" width="80%" mt={2} mb={2} />
           ) : (
             <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
-              {dashboardData.growthRate}%
+              coming soon
+              {/* {dashboardData.growthRate}% */}
             </StatNumber>
           )}
           <StatHelpText>Compared to last month</StatHelpText>
@@ -653,8 +655,6 @@ const AdminDashboard = () => {
                     <Tr>
                       <Th>Class</Th>
                       <Th isNumeric>Attendees</Th>
-                      <Th isNumeric>Revenue</Th>
-                      <Th>Actions</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -668,12 +668,6 @@ const AdminDashboard = () => {
                               </Td>
                               <Td isNumeric>
                                 <Skeleton height="24px" width="60px" />
-                              </Td>
-                              <Td isNumeric>
-                                <Skeleton height="24px" width="80px" />
-                              </Td>
-                              <Td>
-                                <Skeleton height="32px" width="100px" />
                               </Td>
                             </Tr>
                           ))
@@ -697,38 +691,6 @@ const AdminDashboard = () => {
                             </Td>
                             <Td isNumeric fontWeight="medium">
                               {classItem._count?.bookings || 0}
-                            </Td>
-                            <Td isNumeric color="green.500" fontWeight="medium">
-                              $
-                              {calculateClassRevenue(
-                                classItem._count?.bookings || 0
-                              )}
-                            </Td>
-                            <Td>
-                              <Menu>
-                                <MenuButton
-                                  as={Button}
-                                  variant="ghost"
-                                  size="sm"
-                                  rightIcon={<FaEllipsisV />}
-                                >
-                                  Actions
-                                </MenuButton>
-                                <MenuList>
-                                  <MenuItem icon={<FaPencilAlt />}>
-                                    Edit
-                                  </MenuItem>
-                                  <MenuItem icon={<FaChartLine />}>
-                                    View Stats
-                                  </MenuItem>
-                                  <MenuItem
-                                    icon={<FaExclamationCircle />}
-                                    color="red.500"
-                                  >
-                                    Disable
-                                  </MenuItem>
-                                </MenuList>
-                              </Menu>
                             </Td>
                           </Tr>
                         ))}
