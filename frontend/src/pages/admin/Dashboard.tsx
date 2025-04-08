@@ -697,23 +697,6 @@ const AdminDashboard = () => {
                   </Tbody>
                 </Table>
               </TableContainer>
-
-              <Button
-                as={RouterLink}
-                to="/admin/classes/new"
-                colorScheme="purple"
-                bgGradient={buttonBgGradient}
-                color="white"
-                width="full"
-                mt={6}
-                _hover={{
-                  bgGradient: buttonHoverBgGradient,
-                  transform: "translateY(-2px)",
-                  boxShadow: "md",
-                }}
-              >
-                Create New Class
-              </Button>
             </CardBody>
           </Card>
         </MotionBox>

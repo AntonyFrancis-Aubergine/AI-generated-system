@@ -427,31 +427,6 @@ const InstructorDashboard = () => {
           </Card>
         </MotionBox>
       </SimpleGrid>
-
-      {/* Create Class Button */}
-      <MotionBox
-        variants={itemVariants}
-        display="flex"
-        justifyContent="center"
-        my={6}
-      >
-        <Button
-          as={RouterLink}
-          to="/admin/classes"
-          size="lg"
-          bgGradient={buttonBgGradient}
-          color="white"
-          _hover={{
-            bgGradient: buttonHoverBgGradient,
-            transform: "translateY(-2px)",
-            boxShadow: "lg",
-          }}
-          px={8}
-          leftIcon={<FaDumbbell />}
-        >
-          Create New Class
-        </Button>
-      </MotionBox>
     </MotionBox>
   );
 };
