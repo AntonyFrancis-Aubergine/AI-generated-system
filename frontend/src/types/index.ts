@@ -65,6 +65,7 @@ export interface FitnessClass {
   instructor?: User;
   startsAt: string;
   endsAt: string;
+  capacity: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -93,6 +94,7 @@ export interface CreateFitnessClassRequest {
   instructorId: string;
   startsAt: string;
   endsAt: string;
+  capacity?: number;
 }
 
 export interface UpdateFitnessClassRequest {
@@ -101,6 +103,7 @@ export interface UpdateFitnessClassRequest {
   instructorId?: string;
   startsAt?: string;
   endsAt?: string;
+  capacity?: number;
 }
 
 // Booking Types

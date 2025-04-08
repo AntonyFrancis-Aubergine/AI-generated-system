@@ -47,6 +47,7 @@ import {
   AlertTitle,
   AlertDescription,
   Icon,
+  FormHelperText,
 } from "@chakra-ui/react";
 import {
   AddIcon,
@@ -62,6 +63,7 @@ import {
   FaChalkboardTeacher,
   FaLayerGroup,
   FaRegCalendarAlt,
+  FaUsers,
 } from "react-icons/fa";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
@@ -113,6 +115,10 @@ const fitnessClassSchema = z
     instructorId: z.string().min(1, "Instructor is required"),
     startsAt: z.string().min(1, "Start time is required"),
     endsAt: z.string().min(1, "End time is required"),
+    capacity: z
+      .string()
+      .transform((val) => (val ? parseInt(val, 10) : undefined))
+      .optional(),
   })
   .refine(
     (data) => {
@@ -143,6 +149,19 @@ const fitnessClassSchema = z
     {
       message: "Invalid date format",
       path: ["startsAt"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.capacity !== undefined) {
+        const capacity = data.capacity;
+        return capacity > 0;
+      }
+      return true;
+    },
+    {
+      message: "Capacity must be a positive number",
+      path: ["capacity"],
     }
   );
 
@@ -321,6 +340,7 @@ const ClassManagement = () => {
       instructorId: "",
       startsAt: "",
       endsAt: "",
+      capacity: "",
     });
     openForm();
   };
@@ -338,6 +358,7 @@ const ClassManagement = () => {
       "endsAt",
       new Date(fitnessClass.endsAt).toISOString().slice(0, 16)
     );
+    setValue("capacity", fitnessClass.capacity.toString());
     openForm();
   };
 
@@ -413,6 +434,7 @@ const ClassManagement = () => {
         ...data,
         startsAt: startsAtDate.toISOString(),
         endsAt: endsAtDate.toISOString(),
+        capacity: data.capacity,
       };
 
       console.log("Submitting class data:", formattedData);
@@ -602,6 +624,7 @@ const ClassManagement = () => {
                   <Th>Category</Th>
                   <Th>Instructor</Th>
                   <Th>Schedule</Th>
+                  <Th>Capacity</Th>
                   <Th width="100px">Actions</Th>
                 </Tr>
               </Thead>
@@ -647,6 +670,12 @@ const ClassManagement = () => {
                           <Text>to {formatDateTime(fitnessClass.endsAt)}</Text>
                         </HStack>
                       </VStack>
+                    </Td>
+                    <Td>
+                      <HStack>
+                        <Icon as={FaUsers} color={`${accentColor}.500`} />
+                        <Text>{fitnessClass.capacity} spots</Text>
+                      </HStack>
                     </Td>
                     <Td>
                       <HStack spacing={2}>
@@ -852,6 +881,36 @@ const ClassManagement = () => {
                     )}
                   </FormControl>
                 </HStack>
+
+                <Divider />
+
+                <Text fontWeight="medium" color={headingColor}>
+                  Class Information
+                </Text>
+
+                <FormControl isInvalid={!!errors.capacity}>
+                  <FormLabel fontWeight="medium">Capacity</FormLabel>
+                  <InputGroup>
+                    <InputLeftElement pointerEvents="none">
+                      <Icon as={FaUsers} color="gray.400" />
+                    </InputLeftElement>
+                    <Input
+                      type="number"
+                      {...register("capacity")}
+                      placeholder="Enter maximum participants (default: 20)"
+                      pl={10}
+                      focusBorderColor={`${accentColor}.400`}
+                    />
+                  </InputGroup>
+                  {errors.capacity && (
+                    <FormErrorMessage>
+                      {errors.capacity.message}
+                    </FormErrorMessage>
+                  )}
+                  <FormHelperText>
+                    Maximum number of participants that can book this class
+                  </FormHelperText>
+                </FormControl>
               </VStack>
             </ModalBody>
             <ModalFooter borderTopWidth="1px" borderColor={cardBorder}>

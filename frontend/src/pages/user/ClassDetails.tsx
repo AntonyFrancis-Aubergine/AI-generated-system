@@ -40,6 +40,7 @@ import {
   FaCalendarCheck,
   FaArrowLeft,
   FaCheckCircle,
+  FaUsers,
 } from "react-icons/fa";
 import { format } from "date-fns";
 import { fitnessClassService, bookingService } from "../../services/api";
@@ -375,6 +376,21 @@ const ClassDetails = () => {
                           (1000 * 60)
                       )}{" "}
                       minutes
+                    </Text>
+                  </Box>
+                </HStack>
+
+                <HStack spacing={4} align="flex-start">
+                  <Icon
+                    as={FaUsers}
+                    color={`${accentColor}.500`}
+                    boxSize={5}
+                    mt={1}
+                  />
+                  <Box>
+                    <Text fontWeight="bold">Capacity</Text>
+                    <Text color={textColor}>
+                      {fitnessClass.capacity} participants
                     </Text>
                   </Box>
                 </HStack>
