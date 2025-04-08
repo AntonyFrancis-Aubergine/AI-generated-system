@@ -158,7 +158,7 @@ const InstructorDashboard = () => {
 
       {/* Stats Grid */}
       <MotionSimpleGrid
-        columns={{ base: 1, md: 2, lg: 4 }}
+        columns={{ base: 1, md: 2, lg: 2 }}
         spacing={6}
         mb={10}
         variants={itemVariants}
@@ -190,24 +190,6 @@ const InstructorDashboard = () => {
           _hover={{ transform: "translateY(-5px)", boxShadow: "md" }}
         >
           <StatLabel display="flex" alignItems="center">
-            <Icon as={FaDumbbell} mr={2} color="purple.500" />
-            Active Classes
-          </StatLabel>
-          <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
-            {activeClasses}
-          </StatNumber>
-          <StatHelpText>Currently teaching</StatHelpText>
-        </Stat>
-
-        <Stat
-          bg={statBg}
-          p={5}
-          borderRadius="lg"
-          boxShadow="sm"
-          transition="all 0.3s"
-          _hover={{ transform: "translateY(-5px)", boxShadow: "md" }}
-        >
-          <StatLabel display="flex" alignItems="center">
             <Icon as={FaStar} mr={2} color="purple.500" />
             Average Rating
           </StatLabel>
@@ -215,24 +197,6 @@ const InstructorDashboard = () => {
             {averageRating}/5
           </StatNumber>
           <StatHelpText>From student feedback</StatHelpText>
-        </Stat>
-
-        <Stat
-          bg={statBg}
-          p={5}
-          borderRadius="lg"
-          boxShadow="sm"
-          transition="all 0.3s"
-          _hover={{ transform: "translateY(-5px)", boxShadow: "md" }}
-        >
-          <StatLabel display="flex" alignItems="center">
-            <Icon as={FaChartLine} mr={2} color="purple.500" />
-            Booking Rate
-          </StatLabel>
-          <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
-            {bookingRate}%
-          </StatNumber>
-          <StatHelpText>Class capacity filled</StatHelpText>
         </Stat>
       </MotionSimpleGrid>
 
