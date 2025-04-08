@@ -37,53 +37,53 @@ export const MESSAGES = {
   MAX: (field: string, max: number): string =>
     `Maximum length should be ${max} for ${field}`,
 
-  REQUIRED_ONE_FIELD: "At least one field is required",
-  REQUIRED_ONE_VALUE: "At least one value is required",
+  REQUIRED_ONE_FIELD: 'At least one field is required',
+  REQUIRED_ONE_VALUE: 'At least one value is required',
 
-  ERROR: "Something went wrong.",
-  FORBIDDEN: "Access forbidden",
-  UNAUTHORIZED: "Unauthorized access",
-  FORBIDDEN_MSG: "Unauthorized access",
-  LOG_OUT_SUCCESS: "Logged out successfully",
-  DATABASE_ERROR: "Database Error",
-  TOKEN_EXPIRED: "Token has expired",
-  USER_ARCHIVED: "Login Failed, User is Archived",
-  VALIDATION_ERR: "Invalid Data",
-  RATE_LIMIT_EXCEEDED: "You have exceeded your request limit",
+  ERROR: 'Something went wrong.',
+  FORBIDDEN: 'Access forbidden',
+  UNAUTHORIZED: 'Unauthorized access',
+  FORBIDDEN_MSG: 'Unauthorized access',
+  LOG_OUT_SUCCESS: 'Logged out successfully',
+  DATABASE_ERROR: 'Database Error',
+  TOKEN_EXPIRED: 'Token has expired',
+  USER_ARCHIVED: 'Login Failed, User is Archived',
+  VALIDATION_ERR: 'Invalid Data',
+  RATE_LIMIT_EXCEEDED: 'You have exceeded your request limit',
 
   // * Add API specific messages here
   HEALTH: {
-    API_RUNNING: "API is running",
-    DATABASE_ERROR: "Database connection error",
+    API_RUNNING: 'API is running',
+    DATABASE_ERROR: 'Database connection error',
   },
 
   AUTH: {
-    REGISTER_SUCCESS: "User registered successfully",
-    LOGIN_SUCCESS: "User logged in successfully",
-    INVALID_CREDENTIALS: "Invalid email or password",
-    EMAIL_EXISTS: "Email already exists",
-    UNAUTHORIZED: "Unauthorized access",
-    FORBIDDEN: "Access forbidden",
+    REGISTER_SUCCESS: 'User registered successfully',
+    LOGIN_SUCCESS: 'User logged in successfully',
+    INVALID_CREDENTIALS: 'Invalid email or password',
+    EMAIL_EXISTS: 'Email already exists',
+    UNAUTHORIZED: 'Unauthorized access',
+    FORBIDDEN: 'Access forbidden',
     PASSWORD_WEAK:
-      "Password is too weak. It should be at least 8 characters and include uppercase, lowercase, numbers, and special characters",
-    TOKEN_INVALID: "Invalid authentication token",
-    TOKEN_MISSING: "Authentication token is missing",
+      'Password is too weak. It should be at least 8 characters and include uppercase, lowercase, numbers, and special characters',
+    TOKEN_INVALID: 'Invalid authentication token',
+    TOKEN_MISSING: 'Authentication token is missing',
   },
 
   FITNESS_CLASS: {
-    CREATED: "Fitness class created successfully",
-    UPDATED: "Fitness class updated successfully",
-    DELETED: "Fitness class deleted successfully",
-    INSTRUCTOR_CONFLICT: "Instructor has a conflicting class at this time",
-    INVALID_TIME_RANGE: "End time must be after start time",
+    CREATED: 'Fitness class created successfully',
+    UPDATED: 'Fitness class updated successfully',
+    DELETED: 'Fitness class deleted successfully',
+    INSTRUCTOR_CONFLICT: 'Instructor has a conflicting class at this time',
+    INVALID_TIME_RANGE: 'End time must be after start time',
     INVALID_INSTRUCTOR_ROLE:
-      "The selected user does not have an instructor role",
+      'The selected user does not have an instructor role',
   },
 
   BOOKING: {
-    CREATED: "Fitness class booked successfully",
-    DELETED: "Booking cancelled successfully",
-    EXISTS: "You have already booked this fitness class",
-    CLASS_TOO_SOON: "Cannot book a class that starts in less than 1 hour",
+    CREATED: 'Fitness class booked successfully',
+    DELETED: 'Booking cancelled successfully',
+    EXISTS: 'You have already booked this fitness class',
+    CLASS_TOO_SOON: 'Cannot book a class that starts in less than 1 hour',
   },
-};
+}
