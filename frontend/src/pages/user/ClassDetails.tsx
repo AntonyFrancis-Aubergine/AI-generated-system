@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
   Container,
@@ -39,10 +39,11 @@ import {
   FaRegCalendarAlt,
   FaCalendarCheck,
   FaArrowLeft,
+  FaCheckCircle,
 } from "react-icons/fa";
 import { format } from "date-fns";
-import { fitnessClassService } from "../../services/api";
-import { FitnessClass } from "../../types";
+import { fitnessClassService, bookingService } from "../../services/api";
+import { FitnessClass, Booking } from "../../types";
 import Loading from "../../components/Loading";
 import ErrorDisplay from "../../components/ErrorDisplay";
 import * as toastUtils from "../../utils/toast";
@@ -76,11 +77,14 @@ const itemVariants = {
 const ClassDetails = () => {
   const { classId } = useParams<{ classId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const toast = useToast();
   const [fitnessClass, setFitnessClass] = useState<FitnessClass | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isBooking, setIsBooking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAlreadyBooked, setIsAlreadyBooked] = useState(false);
+  const [checkingBookingStatus, setCheckingBookingStatus] = useState(true);
 
   // Theme colors
   const cardBg = useColorModeValue("white", "gray.800");
@@ -116,6 +120,35 @@ const ClassDetails = () => {
     fetchClassDetails();
   }, [classId]);
 
+  // Check if user has already booked this class
+  useEffect(() => {
+    const checkBookingStatus = async () => {
+      if (!classId) return;
+
+      try {
+        setCheckingBookingStatus(true);
+        // Get user's bookings
+        const response = await bookingService.getBookings(1, 100);
+
+        if (response.success) {
+          // Check if any booking matches this class ID
+          const isBooked = response.data.data.some(
+            (booking) => booking.fitnessClassId === classId
+          );
+          setIsAlreadyBooked(isBooked);
+        }
+      } catch (err) {
+        console.error("Error checking booking status:", err);
+        // Don't set error state, just assume not booked
+        setIsAlreadyBooked(false);
+      } finally {
+        setCheckingBookingStatus(false);
+      }
+    };
+
+    checkBookingStatus();
+  }, [classId]);
+
   const handleBookClass = async () => {
     if (!classId || !fitnessClass) return;
 
@@ -124,6 +157,7 @@ const ClassDetails = () => {
       const response = await fitnessClassService.bookClass(classId);
 
       if (response.success) {
+        setIsAlreadyBooked(true);
         toast(toastUtils.bookingSuccessToast(fitnessClass.name));
       } else {
         toast(toastUtils.bookingErrorToast(response.message));
@@ -207,10 +241,10 @@ const ClassDetails = () => {
         <Button
           leftIcon={<FaArrowLeft />}
           variant="ghost"
-          onClick={() => navigate("/classes")}
+          onClick={() => navigate(-1)}
           _hover={{ bg: `${accentColor}.50` }}
         >
-          Back to Classes
+          Back
         </Button>
       </MotionFlex>
 
@@ -257,6 +291,17 @@ const ClassDetails = () => {
                     ? "In Progress"
                     : "Upcoming"}
                 </Badge>
+                {isAlreadyBooked && (
+                  <Badge
+                    colorScheme="purple"
+                    fontSize="0.8em"
+                    px={2}
+                    py={1}
+                    borderRadius="full"
+                  >
+                    Booked
+                  </Badge>
+                )}
               </HStack>
               <Heading as="h1" size="xl" mb={2} color={headingColor}>
                 {fitnessClass.name}
@@ -348,56 +393,97 @@ const ClassDetails = () => {
                 <CardBody>
                   <VStack spacing={6} align="stretch">
                     <Heading as="h3" size="md" color={headingColor}>
-                      Book This Class
+                      {isAlreadyBooked ? "Class Booked" : "Book This Class"}
                     </Heading>
 
-                    <Text color={textColor}>
-                      Ready to join this class? Click below to secure your spot.
-                    </Text>
-
-                    <Box
-                      bg={useColorModeValue(
-                        `${accentColor}.50`,
-                        `${accentColor}.900`
-                      )}
-                      p={4}
-                      borderRadius="md"
-                    >
-                      <HStack>
-                        <Icon as={InfoIcon} color={`${accentColor}.500`} />
-                        <Text fontWeight="medium" fontSize="sm">
-                          {isClassEnded
-                            ? "This class has already ended"
-                            : isClassStarted
-                            ? "This class has already started"
-                            : "Classes can be booked up until 1 hour before start time"}
+                    {isAlreadyBooked ? (
+                      <Box>
+                        <HStack
+                          bg={useColorModeValue("green.50", "green.900")}
+                          p={4}
+                          borderRadius="md"
+                          spacing={3}
+                        >
+                          <Icon
+                            as={FaCheckCircle}
+                            color="green.500"
+                            boxSize={5}
+                          />
+                          <Text fontWeight="medium">
+                            You've already booked this class!
+                          </Text>
+                        </HStack>
+                        <Text mt={4} color={textColor}>
+                          View your booking details and manage your bookings in
+                          the My Bookings section.
                         </Text>
-                      </HStack>
-                    </Box>
+                      </Box>
+                    ) : (
+                      <>
+                        <Text color={textColor}>
+                          Ready to join this class? Click below to secure your
+                          spot.
+                        </Text>
 
-                    <Button
-                      colorScheme={accentColor}
-                      size="lg"
-                      width="100%"
-                      onClick={handleBookClass}
-                      isLoading={isBooking}
-                      loadingText="Booking..."
-                      isDisabled={isClassStarted}
-                      leftIcon={<FaCalendarCheck />}
-                      boxShadow="md"
-                      _hover={
-                        !isClassStarted
-                          ? { transform: "translateY(-2px)", boxShadow: "lg" }
-                          : undefined
-                      }
-                      transition="all 0.2s"
-                    >
-                      {isClassEnded
-                        ? "Class Ended"
-                        : isClassStarted
-                        ? "Class In Progress"
-                        : "Book Now"}
-                    </Button>
+                        <Box
+                          bg={useColorModeValue(
+                            `${accentColor}.50`,
+                            `${accentColor}.900`
+                          )}
+                          p={4}
+                          borderRadius="md"
+                        >
+                          <HStack>
+                            <Icon as={InfoIcon} color={`${accentColor}.500`} />
+                            <Text fontWeight="medium" fontSize="sm">
+                              {isClassEnded
+                                ? "This class has already ended"
+                                : isClassStarted
+                                ? "This class has already started"
+                                : "Classes can be booked up until 1 hour before start time"}
+                            </Text>
+                          </HStack>
+                        </Box>
+
+                        {checkingBookingStatus ? (
+                          <Button
+                            colorScheme={accentColor}
+                            size="lg"
+                            width="100%"
+                            isLoading
+                            loadingText="Checking booking status..."
+                            boxShadow="md"
+                          />
+                        ) : (
+                          <Button
+                            colorScheme={accentColor}
+                            size="lg"
+                            width="100%"
+                            onClick={handleBookClass}
+                            isLoading={isBooking}
+                            loadingText="Booking..."
+                            isDisabled={isClassStarted}
+                            leftIcon={<FaCalendarCheck />}
+                            boxShadow="md"
+                            _hover={
+                              !isClassStarted
+                                ? {
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "lg",
+                                  }
+                                : undefined
+                            }
+                            transition="all 0.2s"
+                          >
+                            {isClassEnded
+                              ? "Class Ended"
+                              : isClassStarted
+                              ? "Class In Progress"
+                              : "Book Now"}
+                          </Button>
+                        )}
+                      </>
+                    )}
                   </VStack>
                 </CardBody>
               </Card>
