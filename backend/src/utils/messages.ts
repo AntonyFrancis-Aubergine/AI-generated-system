@@ -78,6 +78,7 @@ export const MESSAGES = {
     INVALID_TIME_RANGE: 'End time must be after start time',
     INVALID_INSTRUCTOR_ROLE:
       'The selected user does not have an instructor role',
+    CAPACITY_INVALID: 'Capacity must be a positive number',
   },
 
   BOOKING: {
@@ -85,5 +86,6 @@ export const MESSAGES = {
     DELETED: 'Booking cancelled successfully',
     EXISTS: 'You have already booked this fitness class',
     CLASS_TOO_SOON: 'Cannot book a class that starts in less than 1 hour',
+    CLASS_FULL: 'This fitness class is already at full capacity',
   },
 }

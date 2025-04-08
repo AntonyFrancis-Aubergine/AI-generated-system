@@ -171,6 +171,18 @@ export const createFitnessClass = async (
     )
   }
 
+  // Validate capacity if provided
+  if (
+    fitnessClassData.capacity !== undefined &&
+    fitnessClassData.capacity <= 0
+  ) {
+    throw new APIError(
+      STATUS_CODES.CLIENT_ERROR.BAD_REQUEST,
+      MESSAGES.FITNESS_CLASS.CAPACITY_INVALID,
+      true
+    )
+  }
+
   // Parse dates
   const startsAt = new Date(fitnessClassData.startsAt)
   const endsAt = new Date(fitnessClassData.endsAt)
@@ -183,6 +195,9 @@ export const createFitnessClass = async (
       instructorId: fitnessClassData.instructorId,
       startsAt,
       endsAt,
+      ...(fitnessClassData.capacity !== undefined && {
+        capacity: fitnessClassData.capacity,
+      }),
     },
     include: {
       category: true,
@@ -367,21 +382,27 @@ export const fetchAvailableFitnessClasses = async (
   const { page, limit } = pagination
   const skip = (page - 1) * limit
 
-  // Find the IDs of fitness classes that the user has already booked
-  const userBookings = await prisma.fitnessClassBooking.findMany({
-    where: { userId },
-    select: { fitnessClassId: true },
-  })
+  // Get the current time
+  const now = new Date()
+  const oneHourFromNow = new Date(now)
+  oneHourFromNow.setHours(oneHourFromNow.getHours() + 1)
 
-  const bookedClassIds = userBookings.map((booking) => booking.fitnessClassId)
-
-  // Add the filter to exclude already booked classes
+  // Create a filter to exclude classes that are already booked by the user
   const completeQuery: Prisma.FitnessClassWhereInput = {
-    ...fitnessClassQuery,
-    // Exclude classes that are in the bookedClassIds array
-    ...(bookedClassIds.length > 0 && {
-      id: { notIn: bookedClassIds },
-    }),
+    AND: [
+      // Only show classes that start more than 1 hour from now
+      { startsAt: { gt: oneHourFromNow } },
+      // Only show classes that are not already booked by the current user
+      {
+        bookings: {
+          none: {
+            userId,
+          },
+        },
+      },
+      // Include any additional filters from the client
+      fitnessClassQuery,
+    ],
   }
 
   // Get total count for pagination metadata
@@ -397,6 +418,11 @@ export const fetchAvailableFitnessClasses = async (
       category: true,
       instructor: true,
       bookings: true,
+      _count: {
+        select: {
+          bookings: true,
+        },
+      },
     },
   })
 

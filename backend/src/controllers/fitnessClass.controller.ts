@@ -7,6 +7,7 @@ import { MESSAGES } from '../utils/messages'
 import { FitnessClassTypes, Pagination } from '../types'
 import { Prisma } from '@prisma/client'
 import { APIError } from '../utils/customError'
+import prisma from '../config/db'
 
 /**
  * Create a new fitness class
@@ -339,10 +340,21 @@ export const getFitnessClassById = catchAsync(
       )
     }
 
+    // Get booking count to show available spots
+    const bookingsCount = await prisma.fitnessClassBooking.count({
+      where: { fitnessClassId: fitnessClassId as string },
+    })
+
+    const availableSpots = fitnessClass.capacity - bookingsCount
+
     return res.status(STATUS_CODES.SUCCESS.OK).json(
       APIResponse.sendSuccess({
         message: MESSAGES.RETRIEVE_SUCCESS('Fitness class'),
-        data: fitnessClass,
+        data: {
+          ...fitnessClass,
+          currentBookings: bookingsCount,
+          availableSpots,
+        },
       })
     )
   }

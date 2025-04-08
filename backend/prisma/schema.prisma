@@ -81,6 +81,7 @@ model FitnessClass {
   instructorId String @map("instructor_id")
   startsAt   DateTime @map("starts_at")
   endsAt     DateTime @map("ends_at")
+  capacity   Int      @default(20)
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
 

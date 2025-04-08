@@ -178,7 +178,7 @@
                 }
               ]
             },
-            "description": "Get available fitness classes with filtering and pagination. Only shows classes that start at least 1 hour from now. Excludes classes already booked by the current user. Returns a paginated result with fitness class data."
+            "description": "Get available fitness classes with filtering and pagination. Only shows classes that start at least 1 hour from now. Excludes classes already booked by the current user. Returns a paginated result with fitness class data including capacity and current booking count information."
           },
           "response": []
         },
@@ -209,7 +209,7 @@
                 }
               ]
             },
-            "description": "Book a fitness class for the current user. Requires authentication. Class must start at least 1 hour from now to be eligible for booking."
+            "description": "Book a fitness class for the current user. Requires authentication. Class must start at least 1 hour from now to be eligible for booking. Booking will fail if the class is already at full capacity."
           },
           "response": []
         },
@@ -240,7 +240,7 @@
                 }
               ]
             },
-            "description": "Get a specific fitness class by ID. Returns detailed information including the category and instructor."
+            "description": "Get a specific fitness class by ID. Returns detailed information including the category, instructor, capacity, current booking count, and available spots."
           },
           "response": []
         }
@@ -424,14 +424,14 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"name\": \"Yoga for Beginners\",\n    \"categoryId\": \"your-category-id\",\n    \"instructorId\": \"your-instructor-id\",\n    \"startsAt\": \"2024-07-15T10:00:00.000Z\",\n    \"endsAt\": \"2024-07-15T11:00:00.000Z\"\n}"
+                  "raw": "{\n    \"name\": \"Yoga for Beginners\",\n    \"categoryId\": \"your-category-id\",\n    \"instructorId\": \"your-instructor-id\",\n    \"startsAt\": \"2024-07-15T10:00:00.000Z\",\n    \"endsAt\": \"2024-07-15T11:00:00.000Z\",\n    \"capacity\": 25\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/admin/fitness-classes",
                   "host": ["{{baseUrl}}"],
                   "path": ["api", "admin", "fitness-classes"]
                 },
-                "description": "Create a new fitness class. Requires admin role. The start and end times must be valid ISO datetime strings, and the end time must be after the start time."
+                "description": "Create a new fitness class. Requires admin role. The start and end times must be valid ISO datetime strings, and the end time must be after the start time. Capacity defines the maximum number of participants that can book the class (defaults to 20 if not specified)."
               },
               "response": []
             },
@@ -457,7 +457,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"name\": \"Updated Yoga Class\",\n    \"categoryId\": \"your-category-id\",\n    \"instructorId\": \"your-instructor-id\",\n    \"startsAt\": \"2024-07-15T11:00:00.000Z\",\n    \"endsAt\": \"2024-07-15T12:00:00.000Z\"\n}"
+                  "raw": "{\n    \"name\": \"Updated Yoga Class\",\n    \"categoryId\": \"your-category-id\",\n    \"instructorId\": \"your-instructor-id\",\n    \"startsAt\": \"2024-07-15T11:00:00.000Z\",\n    \"endsAt\": \"2024-07-15T12:00:00.000Z\",\n    \"capacity\": 30\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/admin/fitness-classes/:fitnessClassId",
@@ -476,7 +476,7 @@
                     }
                   ]
                 },
-                "description": "Update an existing fitness class. Requires admin role. All fields are optional - only provided fields will be updated. If updating time or instructor, checks are performed to avoid scheduling conflicts."
+                "description": "Update an existing fitness class. Requires admin role. All fields are optional - only provided fields will be updated. If updating time or instructor, checks are performed to avoid scheduling conflicts. Capacity must be a positive integer if specified."
               },
               "response": []
             },

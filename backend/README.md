@@ -89,6 +89,7 @@ A Postman collection is included in the project root (`postman_collection.json`)
 - `GET /api/v1/fitness-classes` - Get available fitness classes with filtering and pagination
   - Only shows classes that start more than 1 hour from now
   - Excludes classes already booked by the current user
+  - Returns capacity and current booking count information
   - Query parameters:
     - `page` - Page number (default: 1)
     - `limit` - Items per page (default: 10)
@@ -100,8 +101,10 @@ A Postman collection is included in the project root (`postman_collection.json`)
 - `GET /api/v1/fitness-classes/:fitnessClassId` - Get a single fitness class by ID
   - Returns detailed information about a specific fitness class
   - Includes category and instructor details
+  - Shows capacity, current booking count, and available spots
 - `POST /api/v1/fitness-classes/:fitnessClassId` - Book a fitness class
   - Only allows booking classes that start more than 1 hour from now
+  - Booking fails if the class is already at full capacity
   - Uses authenticated user's ID for booking
 
 #### Categories
@@ -149,6 +152,13 @@ A Postman collection is included in the project root (`postman_collection.json`)
     - `startDateFrom` - Filter classes starting after this date
     - `startDateTo` - Filter classes starting before this date
 - `POST /api/admin/fitness-classes` - Create a fitness class
+  - Request body parameters:
+    - `name` - Class name (required)
+    - `categoryId` - Category ID (required)
+    - `instructorId` - Instructor ID (required)
+    - `startsAt` - Start time of the class (ISO format, required)
+    - `endsAt` - End time of the class (ISO format, required)
+    - `capacity` - Maximum number of participants (optional, default: 20)
 - `PUT /api/admin/fitness-classes/:fitnessClassId` - Update a fitness class
   - All fields are optional - only provided fields will be updated
   - If updating time or instructor, checks for scheduling conflicts
@@ -158,6 +168,7 @@ A Postman collection is included in the project root (`postman_collection.json`)
     - `instructorId` - Instructor ID (optional)
     - `startsAt` - Start time of the class (ISO format, optional)
     - `endsAt` - End time of the class (ISO format, optional)
+    - `capacity` - Maximum number of participants (optional, must be positive)
 - `DELETE /api/admin/fitness-classes/:fitnessClassId` - Delete a fitness class
   - Cannot delete classes that have active bookings
   - Returns a success message when deletion is successful
@@ -185,4 +196,41 @@ src/
 ├── types/          # TypeScript type definitions
 ├── utils/          # Utility functions
 └── server.ts       # Application entry point
+```
+
+## Error Handling
+
+The API provides meaningful error messages for various scenarios:
+
+### Authentication Errors
+
+- Invalid email or password
+- Unauthorized access
+- Invalid or missing authentication token
+
+### Validation Errors
+
+- Invalid data formats (e.g., dates, UUIDs)
+- Missing required fields
+
+### Booking Errors
+
+- Class is already fully booked
+- User has already booked the class
+- Class starts too soon (less than 1 hour)
+
+### Capacity Errors
+
+- Invalid capacity value (must be a positive integer)
+- Class is at full capacity when attempting to book
+
+All error responses follow a consistent format:
+
+```json
+{
+  "success": false,
+  "message": "Error message describing the issue",
+  "data": null,
+  "extra": { ... } // Optional additional details
+}
 ```

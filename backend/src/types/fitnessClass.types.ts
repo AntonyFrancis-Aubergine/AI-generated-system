@@ -26,6 +26,11 @@ export interface CreateFitnessClassRequest {
    * End time of the class (ISO format)
    */
   endsAt: string
+
+  /**
+   * Maximum capacity of the class
+   */
+  capacity?: number
 }
 
 /**
@@ -38,6 +43,7 @@ export interface FitnessClassResponse {
   instructorId: string
   startsAt: Date
   endsAt: Date
+  capacity: number
   createdAt: Date
   updatedAt: Date
 

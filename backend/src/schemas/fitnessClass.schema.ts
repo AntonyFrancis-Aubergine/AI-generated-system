@@ -30,6 +30,12 @@ export const createFitnessClassSchema = z
       .string()
       .datetime({ message: MESSAGES.INVALID('End time') })
       .nonempty({ message: MESSAGES.REQUIRED('End time') }),
+
+    capacity: z
+      .number()
+      .int({ message: MESSAGES.DATA_TYPE('Capacity', 'an integer') })
+      .positive({ message: MESSAGES.NOT_POSITIVE('Capacity') })
+      .optional(),
   })
   .refine((data) => new Date(data.startsAt) < new Date(data.endsAt), {
     message: 'End time must be after start time',
@@ -64,6 +70,12 @@ export const updateFitnessClassSchema = z
     endsAt: z
       .string()
       .datetime({ message: MESSAGES.INVALID('End time') })
+      .optional(),
+
+    capacity: z
+      .number()
+      .int({ message: MESSAGES.DATA_TYPE('Capacity', 'an integer') })
+      .positive({ message: MESSAGES.NOT_POSITIVE('Capacity') })
       .optional(),
   })
   .refine(
