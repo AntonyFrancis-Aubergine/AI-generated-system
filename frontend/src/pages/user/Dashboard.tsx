@@ -303,7 +303,7 @@ const UserDashboard = () => {
           >
             <CardHeader pb={0}>
               <Heading size="md" mb={2} color={headingColor}>
-                Recommended Classes
+                Recommended Classes (coming soon)
               </Heading>
               <Text fontSize="sm" color={textColor}>
                 Based on your previous activities
