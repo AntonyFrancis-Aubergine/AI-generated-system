@@ -207,7 +207,7 @@ const InstructorDashboard = () => {
   };
 
   // Mock data
-  const totalStudents = 78;
+  const totalStudents = 3;
   const activeClasses = 5;
   const averageRating = 4.8;
   const bookingRate = 94;
@@ -287,7 +287,7 @@ const InstructorDashboard = () => {
         >
           <StatLabel display="flex" alignItems="center">
             <Icon as={FaStar} mr={2} color="purple.500" />
-            Average Rating
+            Average Rating (coming soon)
           </StatLabel>
           <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
             {averageRating}/5
