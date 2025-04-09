@@ -39,6 +39,7 @@ model User {
   
   instructedClasses  FitnessClass[]
   bookings        FitnessClassBooking[]
+  reviews         FitnessClassReview[]
   
   // Friend connection relationships
   sentFriendRequests     UserFriendship[] @relation("SentFriendRequests")
@@ -88,6 +89,7 @@ model FitnessClass {
   category   FitnessClassCategory @relation(fields: [categoryId], references: [id])
   instructor User                 @relation(fields: [instructorId], references: [id])
   bookings   FitnessClassBooking[]
+  reviews    FitnessClassReview[]
 
   @@map("fitness_classes")
 }
@@ -103,6 +105,22 @@ model FitnessClassBooking {
   fitnessClass FitnessClass @relation(fields: [fitnessClassId], references: [id])
 
   @@map("fitness_class_bookings")
+}
+
+model FitnessClassReview {
+  id              String   @id @default(uuid())
+  rating          Int      // Rating between 1-5
+  feedback        String?  // Optional feedback text
+  userId          String   @map("user_id")
+  fitnessClassId  String   @map("fitness_class_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User         @relation(fields: [userId], references: [id])
+  fitnessClass    FitnessClass @relation(fields: [fitnessClassId], references: [id])
+
+  @@unique([userId, fitnessClassId]) // One review per user per class
+  @@map("fitness_class_reviews")
 }
 
 

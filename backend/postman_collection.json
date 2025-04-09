@@ -644,6 +644,164 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Submit Review",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fitnessClassId\": \"your-fitness-class-id\",\n    \"rating\": 5,\n    \"feedback\": \"Great class! Really enjoyed the workout and the instructor was very helpful.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews"]
+            },
+            "description": "Submit a review for a fitness class. Requires authentication. User must have booked the class and the class must have already ended. Rating must be between 1-5 stars."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Class Reviews",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/classes/:fitnessClassId?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews", "classes", ":fitnessClassId"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items per page"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "fitnessClassId",
+                  "value": "your-fitness-class-id",
+                  "description": "ID of the fitness class to get reviews for"
+                }
+              ]
+            },
+            "description": "Get all reviews for a fitness class with pagination. Requires authentication. Returns a paginated list of reviews with user details."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Class Rating Summary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/classes/:fitnessClassId/summary",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                "classes",
+                ":fitnessClassId",
+                "summary"
+              ],
+              "variable": [
+                {
+                  "key": "fitnessClassId",
+                  "value": "your-fitness-class-id",
+                  "description": "ID of the fitness class to get rating summary for"
+                }
+              ]
+            },
+            "description": "Get rating summary for a fitness class. Requires authentication. Returns average rating and distribution of ratings (1-5 stars)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Review for Class",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/classes/:fitnessClassId/user",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                "classes",
+                ":fitnessClassId",
+                "user"
+              ],
+              "variable": [
+                {
+                  "key": "fitnessClassId",
+                  "value": "your-fitness-class-id",
+                  "description": "ID of the fitness class to get user's review for"
+                }
+              ]
+            },
+            "description": "Get the current user's review for a fitness class. Requires authentication. Returns the authenticated user's review for the specified class or a 404 error if no review exists."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for users to review fitness classes they have attended"
     }
   ],
   "event": [
