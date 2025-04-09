@@ -126,15 +126,15 @@ const UserDashboard = () => {
         setCompletedClasses(completed);
 
         // Calculate simple fitness score based on activity (just a demo calculation)
-        const score = Math.min(100, 50 + completed * 5);
-        setFitnessScore(score);
+        // const score = Math.min(100, 50 + completed * 5);
+        setFitnessScore(0);
       }
     } catch (error) {
       console.error("Error fetching user stats:", error);
       // Set default values
       setUpcomingClasses(0);
       setCompletedClasses(0);
-      setFitnessScore(50);
+      setFitnessScore(0);
     } finally {
       setIsStatsLoading(false);
     }
