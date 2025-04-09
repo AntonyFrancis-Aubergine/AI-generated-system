@@ -88,18 +88,22 @@ const AuthLayout = () => {
       animate="visible"
       variants={containerVariants}
     >
-      <Container maxW="container.xl" py={5} flex="1" display="flex" flexDirection="column">
+      <Container
+        maxW="container.xl"
+        py={5}
+        flex="1"
+        display="flex"
+        flexDirection="column"
+      >
         <MotionFlex
           justify="space-between"
           align="center"
           mb={10}
           variants={itemVariants}
         >
-          <Link to="/">
-            <Box py={2}>
-              <Logo />
-            </Box>
-          </Link>
+          <Box py={2}>
+            <Logo />
+          </Box>
           <MotionIconButton
             aria-label={`Toggle ${
               colorMode === "light" ? "Dark" : "Light"

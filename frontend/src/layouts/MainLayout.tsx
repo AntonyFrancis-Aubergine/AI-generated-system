@@ -201,9 +201,7 @@ const MainLayout = () => {
           <Flex h={16} alignItems="center" justifyContent="space-between">
             <HStack spacing={8} alignItems="center">
               <Box>
-                <Link to="/">
-                  <Logo />
-                </Link>
+                <Logo />
               </Box>
               <HStack
                 as="nav"
