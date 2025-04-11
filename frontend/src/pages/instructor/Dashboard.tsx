@@ -32,6 +32,7 @@ import {
   Tooltip,
   Alert,
   AlertIcon,
+  Stack,
 } from "@chakra-ui/react";
 import {
   FaUsers,
@@ -42,14 +43,18 @@ import {
   FaClock,
   FaExclamationCircle,
   FaCheckCircle,
+  FaQuoteLeft,
+  FaQuoteRight,
 } from "react-icons/fa";
+import { StarIcon } from "@chakra-ui/icons";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { Link as RouterLink } from "react-router-dom";
 import { instructorService } from "../../services/api";
-import { FitnessClass } from "../../types";
+import { FitnessClass, Review } from "../../types";
 import { format, isBefore, isToday, isTomorrow, addDays } from "date-fns";
+import { formatDate, getRelativeTimeString } from "../../utils/dateUtils";
 
 // Create motion components
 const MotionBox = motion(Box);
@@ -82,6 +87,8 @@ const InstructorDashboard = () => {
   const [upcomingClasses, setUpcomingClasses] = useState<FitnessClass[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
 
   // Theme colors
   const cardBg = useColorModeValue("white", "gray.800");
@@ -139,6 +146,32 @@ const InstructorDashboard = () => {
     };
 
     fetchClasses();
+  }, [user]);
+
+  // New useEffect to fetch instructor's reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        // Verify the user is an instructor
+        if (!user || user.role !== "INSTRUCTOR") {
+          return;
+        }
+
+        setIsLoadingReviews(true);
+        const response = await instructorService.getInstructorReviews(1, 5);
+
+        if (response.success) {
+          setReviews(response.data.data);
+        }
+      } catch (err) {
+        console.error("Error fetching instructor reviews:", err);
+        // We don't set error state here to avoid disrupting the entire dashboard
+      } finally {
+        setIsLoadingReviews(false);
+      }
+    };
+
+    fetchReviews();
   }, [user]);
 
   // Format date for display
@@ -219,38 +252,53 @@ const InstructorDashboard = () => {
     { id: 3, name: "Emily Davis", classes: 15, lastClass: "4 days ago" },
   ];
 
-  // Feedback data
-  const recentFeedback = [
-    {
-      id: 1,
-      student: "Lisa M.",
-      class: "Power Yoga",
-      rating: 5,
-      comment: "Amazing class! The instructor was very attentive and helpful.",
-      date: "Aug 15, 2023",
-    },
-    {
-      id: 2,
-      student: "John D.",
-      class: "HIIT Workout",
-      rating: 4,
-      comment: "Great workout, challenging but fun.",
-      date: "Aug 12, 2023",
-    },
-  ];
+  // New helper to render star rating
+  const renderStarRating = (rating: number) => {
+    return (
+      <Flex>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <StarIcon
+            key={star}
+            color={rating >= star ? "yellow.400" : "gray.200"}
+            boxSize={3}
+            mr={0.5}
+          />
+        ))}
+      </Flex>
+    );
+  };
+
+  // Helper to get a short excerpt from longer feedback text
+  const getFeedbackExcerpt = (
+    feedback: string | null,
+    maxLength = 100
+  ): string => {
+    if (!feedback) return "";
+    return feedback.length > maxLength
+      ? `${feedback.substring(0, maxLength)}...`
+      : feedback;
+  };
 
   return (
-    <MotionBox initial="hidden" animate="visible" variants={containerVariants}>
-      {/* Welcome Section */}
-      <MotionFlex variants={itemVariants} direction="column" mb={8}>
-        <Heading as="h1" size="xl" mb={2} color={headingColor}>
+    <MotionBox
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      pt={5}
+      px={{ base: 4, md: 8 }}
+      maxW="container.xl"
+      mx="auto"
+    >
+      {/* Instructor Welcome */}
+      <MotionBox variants={itemVariants} mb={8}>
+        <Heading as="h1" size="xl" mb={2}>
           Instructor Dashboard
         </Heading>
         <Text color={textColor}>
-          Welcome back, {user?.name}. Manage your classes and track your
+          Welcome back, {user?.name}. Here's an overview of your classes and
           performance.
         </Text>
-      </MotionFlex>
+      </MotionBox>
 
       {/* Stats Grid */}
       <MotionSimpleGrid
@@ -539,69 +587,114 @@ const InstructorDashboard = () => {
             _hover={{ boxShadow: "md" }}
           >
             <CardHeader pb={0}>
-              <Heading size="md" mb={2} color={headingColor}>
-                Recent Feedback
-              </Heading>
+              <HStack spacing={2} mb={2}>
+                <Icon as={FaStar} color="yellow.400" boxSize={5} />
+                <Heading size="md" color={headingColor}>
+                  Student Reviews
+                </Heading>
+              </HStack>
               <Text fontSize="sm" color={textColor}>
-                What your students are saying
+                What your students are saying about your classes
               </Text>
             </CardHeader>
             <CardBody>
-              <VStack spacing={4} align="stretch">
-                {recentFeedback.map((feedback) => (
-                  <Box
-                    key={feedback.id}
-                    p={4}
-                    borderWidth="1px"
-                    borderRadius="md"
-                    borderColor={cardBorder}
-                    _hover={{
-                      bg: useColorModeValue("gray.50", "gray.700"),
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    <HStack justify="space-between" mb={2}>
-                      <HStack>
-                        <Text fontWeight="medium">{feedback.student}</Text>
-                        <Text fontSize="sm" color={textColor}>
-                          on {feedback.class}
-                        </Text>
+              {isLoadingReviews ? (
+                <Flex justify="center" align="center" py={10}>
+                  <Spinner size="lg" color="purple.500" />
+                </Flex>
+              ) : reviews.length > 0 ? (
+                <VStack spacing={4} align="stretch">
+                  {/* Show up to 5 reviews in this card */}
+                  {reviews.slice(0, 5).map((review) => (
+                    <Box
+                      key={review.id}
+                      p={4}
+                      borderWidth="1px"
+                      borderRadius="md"
+                      borderColor={cardBorder}
+                      _hover={{
+                        bg: useColorModeValue("gray.50", "gray.700"),
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      <HStack spacing={3} align="flex-start" mb={2}>
+                        <Avatar
+                          size="sm"
+                          name={review.user?.name || "Student"}
+                          bg="purple.500"
+                        />
+                        <Box flex="1">
+                          <Flex justify="space-between" align="center">
+                            <Text fontWeight="medium">
+                              {review.user?.name || "Student"}
+                            </Text>
+                            <Badge colorScheme="purple" borderRadius="full">
+                              {review.fitnessClass?.name || "Class"}
+                            </Badge>
+                          </Flex>
+                          <HStack spacing={2} mt={1}>
+                            {renderStarRating(review.rating)}
+                            <Text fontSize="xs" color="gray.500">
+                              {getRelativeTimeString(review.createdAt)}
+                            </Text>
+                          </HStack>
+                        </Box>
                       </HStack>
-                      <HStack>
-                        {[...Array(5)].map((_, i) => (
+
+                      {review.feedback && (
+                        <Box mt={2} position="relative" pl={4} pr={4}>
                           <Icon
-                            key={i}
-                            as={FaStar}
-                            color={
-                              i < feedback.rating ? "yellow.400" : "gray.300"
-                            }
+                            as={FaQuoteLeft}
+                            position="absolute"
+                            left={0}
+                            top={0}
+                            color="purple.200"
                             boxSize={3}
+                            opacity={0.8}
                           />
-                        ))}
-                      </HStack>
-                    </HStack>
+                          <Text
+                            fontSize="sm"
+                            color={textColor}
+                            fontStyle="italic"
+                          >
+                            {getFeedbackExcerpt(review.feedback)}
+                          </Text>
+                          <Icon
+                            as={FaQuoteRight}
+                            position="absolute"
+                            right={0}
+                            bottom={0}
+                            color="purple.200"
+                            boxSize={3}
+                            opacity={0.8}
+                          />
+                        </Box>
+                      )}
+                    </Box>
+                  ))}
 
-                    <Text fontSize="sm" mb={2}>
-                      "{feedback.comment}"
-                    </Text>
-
-                    <Text fontSize="xs" color={textColor} textAlign="right">
-                      {feedback.date}
-                    </Text>
-                  </Box>
-                ))}
-
-                <Button
-                  as={RouterLink}
-                  to="/instructor/feedback"
-                  colorScheme="purple"
-                  variant="outline"
-                  alignSelf="flex-start"
-                  mt={2}
-                >
-                  View All Feedback
-                </Button>
-              </VStack>
+                  <Button
+                    as={RouterLink}
+                    to="/instructor/reviews"
+                    colorScheme="purple"
+                    variant="outline"
+                    alignSelf="flex-start"
+                    mt={2}
+                  >
+                    View All Feedback
+                  </Button>
+                </VStack>
+              ) : (
+                <Box p={6} textAlign="center">
+                  <Text color={textColor}>
+                    No reviews yet for your classes.
+                  </Text>
+                  <Text fontSize="sm" mt={2}>
+                    Reviews will appear here when students leave feedback for
+                    your classes.
+                  </Text>
+                </Box>
+              )}
             </CardBody>
           </Card>
         </MotionBox>

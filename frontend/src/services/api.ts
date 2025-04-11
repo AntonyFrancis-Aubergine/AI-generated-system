@@ -4,12 +4,15 @@ import {
   AuthResponse,
   Booking,
   Category,
+  ClassRatingSummary,
   CreateFitnessClassRequest,
+  CreateReviewRequest,
   FitnessClass,
   FitnessClassFilters,
   LoginRequest,
   PaginatedResponse,
   RegisterRequest,
+  Review,
   UpdateFitnessClassRequest,
   User,
   Friendship,
@@ -102,12 +105,13 @@ const configureInterceptors = (instance: AxiosInstance): void => {
           "Setting auth header with token:",
           token.substring(0, 10) + "..."
         );
-        console.log("API request to:", config.baseURL + config.url);
+        const baseUrl = config.baseURL || "";
+        const url = config.url || "";
+        console.log("API request to:", baseUrl + url);
       } else {
-        console.warn(
-          "No token found for API request to:",
-          config.baseURL + config.url
-        );
+        const baseUrl = config.baseURL || "";
+        const url = config.url || "";
+        console.warn("No token found for API request to:", baseUrl + url);
       }
     } catch (error) {
       console.error("Error accessing localStorage:", error);
@@ -477,18 +481,109 @@ export const instructorService = {
     limit = 10
   ): Promise<ApiResponse<PaginatedResponse<FitnessClass>>> => {
     try {
-      console.log("Fetching instructor classes with params:", { page, limit });
-
       const response = await api.get<
         ApiResponse<PaginatedResponse<FitnessClass>>
       >("/instructors/classes", {
         params: { page, limit },
       });
-
-      console.log("Instructor classes response:", response);
       return response.data;
     } catch (error) {
-      console.error("Error fetching instructor classes:", error);
+      throw handleApiError(error);
+    }
+  },
+
+  // New method to get reviews for instructor's classes
+  getInstructorReviews: async (
+    page = 1,
+    limit = 5
+  ): Promise<ApiResponse<PaginatedResponse<Review>>> => {
+    try {
+      const response = await api.get<ApiResponse<PaginatedResponse<Review>>>(
+        "/instructors/reviews",
+        {
+          params: { page, limit },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      // If the endpoint doesn't exist yet, simulate the response using existing endpoints
+      // The backend would need to implement this endpoint to fetch all reviews for an instructor's classes
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        console.warn(
+          "Instructor reviews endpoint not found, using fallback logic"
+        );
+
+        // Fallback implementation: Get instructor classes first, then fetch reviews for each
+        const classesResponse = await instructorService.getInstructorClasses(
+          1,
+          10
+        );
+        if (!classesResponse.success || !classesResponse.data.data.length) {
+          return {
+            success: true,
+            message: "No classes found for instructor",
+            data: {
+              data: [],
+              meta: { total: 0, page: 1, limit, totalPages: 0 },
+            },
+          };
+        }
+
+        // Get all class IDs
+        const classIds = classesResponse.data.data.map((c) => c.id);
+
+        // For each class, try to get reviews
+        let allReviews: Review[] = [];
+        for (const classId of classIds) {
+          try {
+            const reviewResponse = await reviewService.getClassReviews(
+              classId,
+              1,
+              3
+            );
+            if (reviewResponse.success && reviewResponse.data.data.length) {
+              // Add class details to reviews
+              const classInfo = classesResponse.data.data.find(
+                (c) => c.id === classId
+              );
+              const reviewsWithClass = reviewResponse.data.data.map(
+                (review) => ({
+                  ...review,
+                  fitnessClass: classInfo || review.fitnessClass,
+                })
+              );
+              allReviews = [...allReviews, ...reviewsWithClass];
+            }
+          } catch (innerError) {
+            console.error(
+              `Error fetching reviews for class ${classId}:`,
+              innerError
+            );
+          }
+        }
+
+        // Sort by date (newest first) and limit to requested amount
+        allReviews.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        const paginatedReviews = allReviews.slice(0, limit);
+
+        return {
+          success: true,
+          message: "Reviews fetched successfully",
+          data: {
+            data: paginatedReviews,
+            meta: {
+              total: allReviews.length,
+              page: 1,
+              limit,
+              totalPages: Math.ceil(allReviews.length / limit),
+            },
+          },
+        };
+      }
+
       throw handleApiError(error);
     }
   },
@@ -584,6 +679,76 @@ export const friendshipService = {
       );
       return response.data;
     } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+};
+
+// Add reviewService after other service exports
+export const reviewService = {
+  // Submit a review
+  submitReview: async (
+    data: CreateReviewRequest
+  ): Promise<ApiResponse<Review>> => {
+    try {
+      const response = await api.post<ApiResponse<Review>>("/reviews", data);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  // Get all reviews for a class
+  getClassReviews: async (
+    fitnessClassId: string,
+    page = 1,
+    limit = 10
+  ): Promise<ApiResponse<PaginatedResponse<Review>>> => {
+    try {
+      const response = await api.get<ApiResponse<PaginatedResponse<Review>>>(
+        `/reviews/classes/${fitnessClassId}`,
+        {
+          params: { page, limit },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  // Get class rating summary
+  getClassRatingSummary: async (
+    fitnessClassId: string
+  ): Promise<ApiResponse<ClassRatingSummary>> => {
+    try {
+      const response = await api.get<ApiResponse<ClassRatingSummary>>(
+        `/reviews/classes/${fitnessClassId}/summary`
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  // Get user's review for a class
+  getUserReviewForClass: async (
+    fitnessClassId: string
+  ): Promise<ApiResponse<Review | null>> => {
+    try {
+      const response = await api.get<ApiResponse<Review | null>>(
+        `/reviews/classes/${fitnessClassId}/user`
+      );
+      return response.data;
+    } catch (error) {
+      // If 404, return null review
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return {
+          success: true,
+          message: "No review found",
+          data: null,
+        };
+      }
       throw handleApiError(error);
     }
   },

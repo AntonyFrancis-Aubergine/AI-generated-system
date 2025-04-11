@@ -168,3 +168,42 @@ export interface FriendshipFilters {
   page?: number;
   limit?: number;
 }
+
+// Review Types
+export interface CreateReviewRequest {
+  fitnessClassId: string;
+  rating: number; // Rating between 1-5 stars
+  feedback?: string; // Optional feedback text
+}
+
+export interface Review {
+  id: string;
+  rating: number;
+  feedback: string | null;
+  userId: string;
+  fitnessClassId: string;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: string;
+    name: string;
+  };
+  fitnessClass?: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface ClassRatingSummary {
+  fitnessClassId: string;
+  className: string;
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: {
+    oneStar: number;
+    twoStars: number;
+    threeStars: number;
+    fourStars: number;
+    fiveStars: number;
+  };
+}
