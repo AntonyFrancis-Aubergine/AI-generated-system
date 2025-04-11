@@ -464,23 +464,25 @@ const AdminDashboard = () => {
           </Button>
           <Button
             as={RouterLink}
-            to="/admin/reports"
+            // to="/admin/reports"
             colorScheme="purple"
             variant="outline"
             leftIcon={<FaChartLine />}
             size="lg"
             m={2}
+            disabled
           >
             View Reports
           </Button>
           <Button
             as={RouterLink}
-            to="/admin/settings"
+            // to="/admin/settings"
             colorScheme="purple"
             variant="outline"
             leftIcon={<FaCog />}
             size="lg"
             m={2}
+            disabled
           >
             System Settings
           </Button>
