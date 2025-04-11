@@ -239,10 +239,17 @@ const InstructorDashboard = () => {
     }
   };
 
+  // Calculate average rating from reviews
+  const calculateAverageRating = (): number => {
+    if (!reviews.length) return 0;
+
+    const sum = reviews.reduce((total, review) => total + review.rating, 0);
+    return parseFloat((sum / reviews.length).toFixed(1));
+  };
+
   // Mock data
   const totalStudents = 3;
   const activeClasses = 5;
-  const averageRating = 4.8;
   const bookingRate = 94;
 
   // Student data
@@ -335,12 +342,40 @@ const InstructorDashboard = () => {
         >
           <StatLabel display="flex" alignItems="center">
             <Icon as={FaStar} mr={2} color="purple.500" />
-            Average Rating (coming soon)
+            Average Rating
           </StatLabel>
-          <StatNumber fontSize="3xl" fontWeight="bold" color="purple.500">
-            {averageRating}/5
-          </StatNumber>
-          <StatHelpText>From student feedback</StatHelpText>
+          {isLoadingReviews ? (
+            <Flex alignItems="center" justifyContent="center" py={2}>
+              <Spinner size="sm" color="purple.500" mr={2} />
+              <Text fontSize="sm">Loading ratings...</Text>
+            </Flex>
+          ) : (
+            <>
+              <Flex alignItems="center">
+                <StatNumber
+                  fontSize="3xl"
+                  fontWeight="bold"
+                  color="purple.500"
+                  mr={2}
+                >
+                  {reviews.length ? `${calculateAverageRating()}/5` : "N/A"}
+                </StatNumber>
+                {reviews.length > 0 && (
+                  <Box>{renderStarRating(calculateAverageRating())}</Box>
+                )}
+              </Flex>
+              <StatHelpText>
+                {reviews.length > 0 ? (
+                  <>
+                    From {reviews.length}{" "}
+                    {reviews.length === 1 ? "review" : "reviews"}
+                  </>
+                ) : (
+                  <>No reviews yet</>
+                )}
+              </StatHelpText>
+            </>
+          )}
         </Stat>
       </MotionSimpleGrid>
 
