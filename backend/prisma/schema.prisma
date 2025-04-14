@@ -19,12 +19,6 @@ enum UserRole {
   ADMIN
 }
 
-enum FriendshipStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-}
-
 model User {
   id       String   @id @default(uuid())
   name     String
@@ -41,27 +35,8 @@ model User {
   bookings        FitnessClassBooking[]
   reviews         FitnessClassReview[]
   favorites       FavoriteClass[]
-  
-  // Friend connection relationships
-  sentFriendRequests     UserFriendship[] @relation("SentFriendRequests")
-  receivedFriendRequests UserFriendship[] @relation("ReceivedFriendRequests")
 
   @@map("users")
-}
-
-model UserFriendship {
-  id          String           @id @default(uuid())
-  status      FriendshipStatus @default(PENDING)
-  senderId    String           @map("sender_id")
-  receiverId  String           @map("receiver_id")
-  createdAt   DateTime         @default(now()) @map("created_at")
-  updatedAt   DateTime         @updatedAt @map("updated_at")
-
-  sender      User             @relation("SentFriendRequests", fields: [senderId], references: [id])
-  receiver    User             @relation("ReceivedFriendRequests", fields: [receiverId], references: [id])
-
-  @@unique([senderId, receiverId])
-  @@map("user_friendships")
 }
 
 model FitnessClassCategory {

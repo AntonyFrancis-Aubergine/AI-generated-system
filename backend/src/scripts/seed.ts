@@ -17,7 +17,6 @@ async function seed() {
   await prisma.fitnessClassBooking.deleteMany({})
   await prisma.fitnessClass.deleteMany({})
   await prisma.fitnessClassCategory.deleteMany({})
-  await prisma.userFriendship.deleteMany({})
   await prisma.user.deleteMany({})
 
   // Create users

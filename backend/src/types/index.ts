@@ -4,7 +4,6 @@ export * as FitnessClassTypes from './fitnessClass.types'
 export * as FitnessClassBookingTypes from './fitnessClassBooking.types'
 export * as InstructorTypes from './instructor.types'
 export * as FitnessClassReviewTypes from './fitnessClassReview.types'
-export * as FriendshipTypes from './friendship.types'
 export * as FavoriteClassTypes from './favoriteClass.types'
 export * as ReviewTypes from './fitnessClassReview.types'
 
