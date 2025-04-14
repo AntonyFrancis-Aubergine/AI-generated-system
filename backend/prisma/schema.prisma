@@ -40,6 +40,7 @@ model User {
   instructedClasses  FitnessClass[]
   bookings        FitnessClassBooking[]
   reviews         FitnessClassReview[]
+  favorites       FavoriteClass[]
   
   // Friend connection relationships
   sentFriendRequests     UserFriendship[] @relation("SentFriendRequests")
@@ -90,6 +91,7 @@ model FitnessClass {
   instructor User                 @relation(fields: [instructorId], references: [id])
   bookings   FitnessClassBooking[]
   reviews    FitnessClassReview[]
+  favorites  FavoriteClass[]
 
   @@map("fitness_classes")
 }
@@ -121,6 +123,20 @@ model FitnessClassReview {
 
   @@unique([userId, fitnessClassId]) // One review per user per class
   @@map("fitness_class_reviews")
+}
+
+model FavoriteClass {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  fitnessClassId  String   @map("fitness_class_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User         @relation(fields: [userId], references: [id])
+  fitnessClass    FitnessClass @relation(fields: [fitnessClassId], references: [id])
+
+  @@unique([userId, fitnessClassId]) // Can only favorite a class once
+  @@map("favorite_classes")
 }
 
 

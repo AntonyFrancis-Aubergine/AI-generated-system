@@ -1,3 +1,5 @@
 export * as AuthSchema from './auth.schema'
 export * as FitnessClassSchema from './fitnessClass.schema'
 export * as ReviewSchema from './fitnessClassReview.schema'
+export * as FriendshipSchema from './friendship.schema'
+export * as FavoriteClassSchema from './favoriteClass.schema'

@@ -290,6 +290,141 @@
       "description": "Endpoints for users to manage their bookings"
     },
     {
+      "name": "Favorites",
+      "item": [
+        {
+          "name": "Get User Favorites",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/favorites?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "favorites"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items per page"
+                }
+              ]
+            },
+            "description": "Get a list of the current user's favorite fitness classes with pagination. Requires authentication. Returns a paginated result with favorite data including fitness class details."
+          },
+          "response": []
+        },
+        {
+          "name": "Add to Favorites",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/favorites/:fitnessClassId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "favorites", ":fitnessClassId"],
+              "variable": [
+                {
+                  "key": "fitnessClassId",
+                  "value": "your-fitness-class-id",
+                  "description": "ID of the fitness class to add to favorites"
+                }
+              ]
+            },
+            "description": "Add a fitness class to the current user's favorites. Requires authentication. Returns success message and favorite details."
+          },
+          "response": []
+        },
+        {
+          "name": "Remove from Favorites",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/favorites/:fitnessClassId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "favorites", ":fitnessClassId"],
+              "variable": [
+                {
+                  "key": "fitnessClassId",
+                  "value": "your-fitness-class-id",
+                  "description": "ID of the fitness class to remove from favorites"
+                }
+              ]
+            },
+            "description": "Remove a fitness class from the current user's favorites. Requires authentication. Returns success message."
+          },
+          "response": []
+        },
+        {
+          "name": "Check Favorite Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/favorites/:fitnessClassId/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "favorites", ":fitnessClassId", "status"],
+              "variable": [
+                {
+                  "key": "fitnessClassId",
+                  "value": "your-fitness-class-id",
+                  "description": "ID of the fitness class to check favorite status"
+                }
+              ]
+            },
+            "description": "Check if a fitness class is in the current user's favorites. Requires authentication. Returns a boolean indicating if the class is favorited."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for users to manage their favorite classes"
+    },
+    {
       "name": "Instructors",
       "item": [
         {
