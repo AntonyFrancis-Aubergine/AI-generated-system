@@ -1,8 +1,10 @@
 export * as HealthTypes from './health.types'
 export * as AuthTypes from './auth.types'
 export * as FitnessClassTypes from './fitnessClass.types'
-export * as BookingTypes from './fitnessClassBooking.types'
+export * as FitnessClassBookingTypes from './fitnessClassBooking.types'
 export * as InstructorTypes from './instructor.types'
+export * as FitnessClassReviewTypes from './fitnessClassReview.types'
+export * as FavoriteClassTypes from './favoriteClass.types'
 export * as ReviewTypes from './fitnessClassReview.types'
 
 export interface Pagination {

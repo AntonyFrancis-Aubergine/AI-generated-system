@@ -131,6 +131,24 @@ A Postman collection is included in the project root (`postman_collection.json`)
     - `page` - Page number (default: 1)
     - `limit` - Items per page (default: 10)
 
+#### Favorites
+
+- `GET /api/v1/favorites` - Get all favorite classes for the authenticated user with pagination
+  - Requires authentication
+  - Returns fitness class details with each favorite
+  - Query parameters:
+    - `page` - Page number (default: 1)
+    - `limit` - Items per page (default: 10)
+- `POST /api/v1/favorites/:fitnessClassId` - Add a fitness class to favorites
+  - Requires authentication
+  - Returns success message and favorite details
+- `DELETE /api/v1/favorites/:fitnessClassId` - Remove a fitness class from favorites
+  - Requires authentication
+  - Returns success message
+- `GET /api/v1/favorites/:fitnessClassId/status` - Check if a fitness class is in favorites
+  - Requires authentication
+  - Returns boolean indicating if the class is favorited by the user
+
 #### Reviews
 
 - `POST /api/v1/reviews` - Submit a review for a fitness class

@@ -6,8 +6,8 @@ import bookingRouter from './booking.routes'
 import categoryRouter from './category.routes'
 import userRouter from './user.routes'
 import instructorRouter from './instructor.routes'
-import friendshipRouter from './friendship.routes'
 import reviewRouter from './review.routes'
+import favoriteRouter from './favorite.routes'
 
 const v1Router = Router()
 
@@ -32,10 +32,10 @@ v1Router.use('/users', userRouter)
 // Instructor routes
 v1Router.use('/instructors', instructorRouter)
 
-// Friendship routes
-v1Router.use('/friendships', friendshipRouter)
-
 // Review routes
 v1Router.use('/reviews', reviewRouter)
+
+// Favorite routes
+v1Router.use('/favorites', favoriteRouter)
 
 export default v1Router

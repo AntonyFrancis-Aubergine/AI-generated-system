@@ -19,12 +19,6 @@ enum UserRole {
   ADMIN
 }
 
-enum FriendshipStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-}
-
 model User {
   id       String   @id @default(uuid())
   name     String
@@ -40,27 +34,9 @@ model User {
   instructedClasses  FitnessClass[]
   bookings        FitnessClassBooking[]
   reviews         FitnessClassReview[]
-  
-  // Friend connection relationships
-  sentFriendRequests     UserFriendship[] @relation("SentFriendRequests")
-  receivedFriendRequests UserFriendship[] @relation("ReceivedFriendRequests")
+  favorites       FavoriteClass[]
 
   @@map("users")
-}
-
-model UserFriendship {
-  id          String           @id @default(uuid())
-  status      FriendshipStatus @default(PENDING)
-  senderId    String           @map("sender_id")
-  receiverId  String           @map("receiver_id")
-  createdAt   DateTime         @default(now()) @map("created_at")
-  updatedAt   DateTime         @updatedAt @map("updated_at")
-
-  sender      User             @relation("SentFriendRequests", fields: [senderId], references: [id])
-  receiver    User             @relation("ReceivedFriendRequests", fields: [receiverId], references: [id])
-
-  @@unique([senderId, receiverId])
-  @@map("user_friendships")
 }
 
 model FitnessClassCategory {
@@ -90,6 +66,7 @@ model FitnessClass {
   instructor User                 @relation(fields: [instructorId], references: [id])
   bookings   FitnessClassBooking[]
   reviews    FitnessClassReview[]
+  favorites  FavoriteClass[]
 
   @@map("fitness_classes")
 }
@@ -121,6 +98,20 @@ model FitnessClassReview {
 
   @@unique([userId, fitnessClassId]) // One review per user per class
   @@map("fitness_class_reviews")
+}
+
+model FavoriteClass {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  fitnessClassId  String   @map("fitness_class_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User         @relation(fields: [userId], references: [id])
+  fitnessClass    FitnessClass @relation(fields: [fitnessClassId], references: [id])
+
+  @@unique([userId, fitnessClassId]) // Can only favorite a class once
+  @@map("favorite_classes")
 }
 
 

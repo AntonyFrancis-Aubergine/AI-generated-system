@@ -98,4 +98,11 @@ export const MESSAGES = {
     CLASS_NOT_ENDED: 'You can only review a class after it has ended',
     INVALID_RATING: 'Rating must be between 1 and 5 stars',
   },
+
+  FAVORITE: {
+    ADDED: 'Fitness class added to favorites successfully',
+    REMOVED: 'Fitness class removed from favorites successfully',
+    EXISTS: 'This fitness class is already in your favorites',
+    NOT_EXISTS: 'This fitness class is not in your favorites',
+  },
 }
