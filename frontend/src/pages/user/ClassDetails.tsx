@@ -67,6 +67,7 @@ import ReviewForm from "../../components/ReviewForm";
 import ReviewDisplay from "../../components/ReviewDisplay";
 import * as toastUtils from "../../utils/toast";
 import { motion } from "framer-motion";
+import FavoriteButton from "../../components/FavoriteButton";
 
 // Create motion components
 const MotionBox = motion(Box);
@@ -391,6 +392,11 @@ const ClassDetails = () => {
                             </Badge>
                           )}
                         </Box>
+                        <FavoriteButton
+                          fitnessClassId={classId || ""}
+                          className={fitnessClass.name}
+                          size="md"
+                        />
                       </Flex>
                     </CardHeader>
 

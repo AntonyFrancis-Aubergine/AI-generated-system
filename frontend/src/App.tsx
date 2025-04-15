@@ -26,6 +26,7 @@ const BookingList = lazy(() => import("./pages/user/BookingList"));
 const UserProfile = lazy(() => import("./pages/user/UserProfile"));
 const UserDashboard = lazy(() => import("./pages/user/Dashboard"));
 const FriendsPage = lazy(() => import("./pages/user/FriendsPage"));
+const Favorites = lazy(() => import("./pages/user/Favorites"));
 
 // Instructor pages
 const InstructorDashboard = lazy(() => import("./pages/instructor/Dashboard"));
@@ -68,6 +69,7 @@ function App() {
                   <Route path="/classes" element={<ClassList />} />
                   <Route path="/classes/:classId" element={<ClassDetails />} />
                   <Route path="/my-bookings" element={<BookingList />} />
+                  <Route path="/favorites" element={<Favorites />} />
                   <Route path="/profile" element={<UserProfile />} />
                   {/* <Route path="/friends" element={<FriendsPage />} /> */}
                   {/* <Route path="/user/friends" element={<FriendsPage />} /> */}

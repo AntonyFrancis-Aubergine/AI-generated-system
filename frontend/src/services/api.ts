@@ -684,6 +684,248 @@ export const friendshipService = {
   },
 };
 
+// Mock favorites implementation using localStorage
+const mockFavoritesService = {
+  // Local storage key
+  STORAGE_KEY: "mock_favorites",
+
+  // Get favorites from localStorage
+  getFavorites: () => {
+    try {
+      const favoritesJson = localStorage.getItem(
+        mockFavoritesService.STORAGE_KEY
+      );
+      return favoritesJson ? JSON.parse(favoritesJson) : [];
+    } catch (error) {
+      console.error("Error reading favorites from localStorage:", error);
+      return [];
+    }
+  },
+
+  // Save favorites to localStorage
+  saveFavorites: (favorites: string[]) => {
+    try {
+      localStorage.setItem(
+        mockFavoritesService.STORAGE_KEY,
+        JSON.stringify(favorites)
+      );
+    } catch (error) {
+      console.error("Error saving favorites to localStorage:", error);
+    }
+  },
+
+  // Add a class ID to favorites
+  addToFavorites: (classId: string) => {
+    const favorites = mockFavoritesService.getFavorites();
+    if (!favorites.includes(classId)) {
+      favorites.push(classId);
+      mockFavoritesService.saveFavorites(favorites);
+    }
+  },
+
+  // Remove a class ID from favorites
+  removeFromFavorites: (classId: string) => {
+    const favorites = mockFavoritesService.getFavorites();
+    const updatedFavorites = favorites.filter((id: string) => id !== classId);
+    mockFavoritesService.saveFavorites(updatedFavorites);
+  },
+
+  // Check if a class ID is in favorites
+  isInFavorites: (classId: string) => {
+    const favorites = mockFavoritesService.getFavorites();
+    return favorites.includes(classId);
+  },
+};
+
+// Add favoriteService after friendshipService and before reviewService
+export const favoriteService = {
+  // Get user's favorite classes with pagination
+  getFavorites: async (
+    page = 1,
+    limit = 10
+  ): Promise<ApiResponse<PaginatedResponse<FitnessClass>>> => {
+    try {
+      // Log the request URL for debugging
+      console.log(
+        `Calling GET favorites with params: page=${page}, limit=${limit}`
+      );
+
+      // Try the endpoint with different formats
+      try {
+        const response = await api.get<
+          ApiResponse<PaginatedResponse<FitnessClass>>
+        >("/favorites", {
+          params: { page, limit },
+        });
+        return response.data;
+      } catch (innerError) {
+        if (
+          axios.isAxiosError(innerError) &&
+          innerError.response?.status === 404
+        ) {
+          console.log("Favorites API not available, using mock implementation");
+
+          // Use mock implementation
+          try {
+            // Use fitnessClassService to get all classes first
+            const allClassesResponse = await fitnessClassService.getClasses({
+              page: 1,
+              limit: 100, // Get a large number of classes to filter
+            });
+
+            if (allClassesResponse.success) {
+              const favoriteIds = mockFavoritesService.getFavorites();
+
+              // Filter classes to only include favorites
+              const favoriteClasses = allClassesResponse.data.data.filter(
+                (fitnessClass) => favoriteIds.includes(fitnessClass.id)
+              );
+
+              // Apply pagination to filtered results
+              const startIndex = (page - 1) * limit;
+              const paginatedClasses = favoriteClasses.slice(
+                startIndex,
+                startIndex + limit
+              );
+
+              return {
+                success: true,
+                message: "Mock favorites retrieved successfully",
+                data: {
+                  data: paginatedClasses,
+                  meta: {
+                    total: favoriteClasses.length,
+                    page,
+                    limit,
+                    totalPages: Math.ceil(favoriteClasses.length / limit),
+                  },
+                },
+              };
+            }
+            throw new Error("Failed to fetch classes for mock favorites");
+          } catch (mockError) {
+            console.error("Error in mock favorites implementation:", mockError);
+            throw mockError;
+          }
+        }
+        throw innerError;
+      }
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Add a class to favorites
+  addToFavorites: async (fitnessClassId: string): Promise<ApiResponse<any>> => {
+    try {
+      console.log(`Adding class to favorites: ${fitnessClassId}`);
+
+      // Try different endpoint formats
+      try {
+        const response = await api.post<ApiResponse<any>>(
+          `/favorites/${fitnessClassId}`
+        );
+        return response.data;
+      } catch (innerError) {
+        if (
+          axios.isAxiosError(innerError) &&
+          innerError.response?.status === 404
+        ) {
+          console.log("Favorites API not available, using mock implementation");
+
+          // Use mock implementation
+          mockFavoritesService.addToFavorites(fitnessClassId);
+
+          return {
+            success: true,
+            message: "Added to favorites (mock)",
+            data: { id: fitnessClassId },
+          };
+        }
+        throw innerError;
+      }
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Remove a class from favorites
+  removeFromFavorites: async (
+    fitnessClassId: string
+  ): Promise<ApiResponse<any>> => {
+    try {
+      console.log(`Removing class from favorites: ${fitnessClassId}`);
+
+      // Try different endpoint formats
+      try {
+        const response = await api.delete<ApiResponse<any>>(
+          `/favorites/${fitnessClassId}`
+        );
+        return response.data;
+      } catch (innerError) {
+        if (
+          axios.isAxiosError(innerError) &&
+          innerError.response?.status === 404
+        ) {
+          console.log("Favorites API not available, using mock implementation");
+
+          // Use mock implementation
+          mockFavoritesService.removeFromFavorites(fitnessClassId);
+
+          return {
+            success: true,
+            message: "Removed from favorites (mock)",
+            data: null,
+          };
+        }
+        throw innerError;
+      }
+    } catch (error) {
+      console.error("Error removing from favorites:", error);
+      throw handleApiError(error);
+    }
+  },
+
+  // Check if a class is favorited
+  checkFavoriteStatus: async (
+    fitnessClassId: string
+  ): Promise<ApiResponse<boolean>> => {
+    try {
+      console.log(`Checking favorite status for class: ${fitnessClassId}`);
+
+      // Try different endpoint formats
+      try {
+        const response = await api.get<ApiResponse<boolean>>(
+          `/favorites/${fitnessClassId}/status`
+        );
+        return response.data;
+      } catch (innerError) {
+        if (
+          axios.isAxiosError(innerError) &&
+          innerError.response?.status === 404
+        ) {
+          console.log("Favorites API not available, using mock implementation");
+
+          // Use mock implementation
+          const isFavorite = mockFavoritesService.isInFavorites(fitnessClassId);
+
+          return {
+            success: true,
+            message: "Favorite status checked (mock)",
+            data: isFavorite,
+          };
+        }
+        throw innerError;
+      }
+    } catch (error) {
+      console.error("Error checking favorite status:", error);
+      throw handleApiError(error);
+    }
+  },
+};
+
 // Add reviewService after other service exports
 export const reviewService = {
   // Submit a review
