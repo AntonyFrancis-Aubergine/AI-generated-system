@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { ZodSchema } from 'zod'
 import { STATUS_CODES } from '../utils/statusCodes'
 import { MESSAGES } from '../utils/messages'
-import { APIResponse } from '../utils/responseGenerator'
+import { errorResponse } from '../utils/responseGenerator'
 
 export const validate = (schema: ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -13,11 +13,7 @@ export const validate = (schema: ZodSchema) => {
         .map((err) => err.message)
         .join(', ')
       res.status(STATUS_CODES.CLIENT_ERROR.BAD_REQUEST).json(
-        APIResponse.sendError({
-          message: MESSAGES.VALIDATION_ERR,
-          data: null,
-          extra: { details: errorDetails },
-        })
+        errorResponse(MESSAGES.VALIDATION_ERR, errorDetails)
       )
       return
     }

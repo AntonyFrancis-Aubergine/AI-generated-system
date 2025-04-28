@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { APIError } from '../utils/customError'
 import { MESSAGES } from '../utils/messages'
 import { STATUS_CODES } from '../utils/statusCodes'
-import { APIResponse } from '../utils/responseGenerator'
+import { errorResponse } from '../utils/responseGenerator'
 
 export const errorConverter = (
   error: any,
@@ -88,7 +88,7 @@ export const errorHandler = (
 
   res
     .status(error.status)
-    .json(APIResponse.sendError({ message: error.message }))
+    .json(errorResponse(error.message))
 
   return
 }

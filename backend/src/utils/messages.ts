@@ -51,3 +51,59 @@ export const MESSAGES = {
 
   // * Add API specific messages here
 }
+
+export const AUTH_MESSAGES = {
+  LOGIN_SUCCESS: 'Login successful',
+  LOGOUT_SUCCESS: 'Logout successful',
+  INVALID_CREDENTIALS: 'Invalid email or password',
+  UNAUTHORIZED: 'Unauthorized access',
+  TOKEN_EXPIRED: 'Token has expired',
+  TOKEN_INVALID: 'Invalid token',
+  INVALID_ROLE: 'Invalid role',
+  INSUFFICIENT_PERMISSIONS: 'Insufficient permissions'
+} as const;
+
+export const USER_MESSAGES = {
+  CREATED: 'User created successfully',
+  UPDATED: 'User updated successfully',
+  DELETED: 'User deleted successfully',
+  NOT_FOUND: 'User not found',
+  EMAIL_EXISTS: 'Email already exists'
+} as const;
+
+export const TEAM_MESSAGES = {
+  CREATED: 'Team created successfully',
+  UPDATED: 'Team updated successfully',
+  DELETED: 'Team deleted successfully',
+  NOT_FOUND: 'Team not found',
+  MEMBER_ADDED: 'Team member added successfully',
+  MEMBER_REMOVED: 'Team member removed successfully',
+  NAME_EXISTS: 'Team name already exists',
+  MEMBER_EXISTS: 'User is already a team member'
+} as const;
+
+export const PROJECT_MESSAGES = {
+  CREATED: 'Project created successfully',
+  UPDATED: 'Project updated successfully',
+  DELETED: 'Project deleted successfully',
+  NOT_FOUND: 'Project not found',
+  NAME_EXISTS: 'Project name already exists'
+} as const;
+
+export const SPRINT_MESSAGES = {
+  CREATED: 'Sprint created successfully',
+  UPDATED: 'Sprint updated successfully',
+  DELETED: 'Sprint deleted successfully',
+  NOT_FOUND: 'Sprint not found',
+  INVALID_DATES: 'Invalid sprint dates',
+  ACTIVE_SPRINT_EXISTS: 'Team already has an active sprint'
+} as const;
+
+export const TICKET_MESSAGES = {
+  CREATED: 'Ticket created successfully',
+  UPDATED: 'Ticket updated successfully',
+  DELETED: 'Ticket deleted successfully',
+  NOT_FOUND: 'Ticket not found',
+  INVALID_STATUS: 'Invalid ticket status',
+  INVALID_PRIORITY: 'Invalid ticket priority'
+} as const;
