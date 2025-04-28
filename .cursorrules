@@ -59,9 +59,9 @@ IMPLEMENTATION GUIDELINES
 
 DATABASE PRACTICES
 
-- Use Prisma ORM for all database operations
-- Define schema in prisma/schema.prisma
-- Do not generate Prisma migrations unless explicitly instructed
+- Use MongoDB as the Database to be created
+- define schema inside it 
+
 
 SECURITY PRACTICES
 
