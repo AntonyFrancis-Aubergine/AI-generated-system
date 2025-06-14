@@ -3,12 +3,12 @@ import type { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import authRoutes from './routes/v1/auth.routes';
-import teamRoutes from './routes/v1/team.routes';
-import ticketRoutes from './routes/v1/ticket.routes';
-import ticketAdvancedRoutes from './routes/v1/ticketAdvanced.routes';
-import sprintRoutes from './routes/v1/sprint.routes';
-import { errorHandler } from './utils/errorHandler';
+import authRoutes from './routes/v1/auth.routes.js';
+import teamRoutes from './routes/v1/team.routes.js';
+import ticketRoutes from './routes/v1/ticket.routes.js';
+import ticketAdvancedRoutes from './routes/v1/ticketAdvanced.routes.js';
+import sprintRoutes from './routes/v1/sprint.routes.js';
+import { errorHandler } from './utils/errorHandler.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 

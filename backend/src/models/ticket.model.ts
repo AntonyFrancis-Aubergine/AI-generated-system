@@ -1,6 +1,18 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { IUser } from './user.model';
 
+export interface ITicketComment {
+  content: string;
+  userId: mongoose.Types.ObjectId;
+  createdAt: Date;
+}
+
+export interface ITicketAttachment {
+  filename: string;
+  path: string;
+  uploadedBy: mongoose.Types.ObjectId;
+}
+
 export interface ITicket extends Document {
   title: string;
   description: string;
@@ -10,16 +22,8 @@ export interface ITicket extends Document {
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   type: 'bug' | 'feature' | 'task' | 'improvement';
-  comments: {
-    content: string;
-    userId: mongoose.Types.ObjectId;
-    createdAt: Date;
-  }[];
-  attachments: {
-    filename: string;
-    path: string;
-    uploadedBy: mongoose.Types.ObjectId;
-  }[];
+  comments: ITicketComment[];
+  attachments: ITicketAttachment[];
   createdAt: Date;
   updatedAt: Date;
 }

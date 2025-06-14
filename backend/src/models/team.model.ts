@@ -3,7 +3,7 @@ import { ROLES } from '../utils/constants';
 
 export interface ITeamMember {
   userId: mongoose.Types.ObjectId;
-  role: typeof ROLES[keyof typeof ROLES];
+  role: string;
 }
 
 export interface ITeam extends Document {

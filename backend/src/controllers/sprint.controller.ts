@@ -38,7 +38,7 @@ export class SprintController {
 
       const sprintData = {
         ...req.body,
-        createdBy: req.user._id
+        createdBy: req.user?.id
       };
 
       const sprint = await this.sprintService.createSprint(sprintData);

@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
-import { register, login } from '../services/auth.service';
-import { successResponse, errorResponse } from '../utils/responseGenerator';
-import { ROLES } from '../utils/constants';
-import { AppError } from '../utils/errorHandler';
+import { register, login } from '../services/auth.service.js';
+import { successResponse, errorResponse } from '../utils/responseGenerator.js';
+import { ROLES } from '../utils/constants.js';
+import { AppError } from '../utils/errorHandler.js';
 
 export const registerValidation = [
   body('email').isEmail().withMessage('Please provide a valid email'),

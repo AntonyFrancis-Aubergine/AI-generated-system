@@ -1,5 +1,20 @@
 import mongoose from 'mongoose';
 
+export interface IBoardColumn {
+  name: string;
+  order: number;
+  tickets: mongoose.Types.ObjectId[];
+}
+
+export interface IProject {
+  name: string;
+  description?: string;
+  teamId: mongoose.Types.ObjectId;
+  boardColumns: IBoardColumn[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const projectSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -41,4 +56,4 @@ const projectSchema = new mongoose.Schema({
   timestamps: true
 });
 
-export const Project = mongoose.model('Project', projectSchema); 
+export const Project = mongoose.model<IProject>('Project', projectSchema); 

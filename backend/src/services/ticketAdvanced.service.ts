@@ -103,7 +103,7 @@ export class TicketAdvancedService {
     });
 
     // Notify relevant users about the dependency
-    await this.notificationService.createDependencyNotification(
+    await this.notificationService.createTicketDependencyNotification(
       ticketId,
       dependentTicketId,
       type

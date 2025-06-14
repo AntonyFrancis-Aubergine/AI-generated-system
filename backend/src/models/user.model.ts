@@ -6,8 +6,8 @@ export interface IUser extends Document {
   email: string;
   password: string;
   name: string;
-  role: typeof ROLES[keyof typeof ROLES];
-  teams: mongoose.Types.ObjectId[];
+  role: string;
+  teamId?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -36,10 +36,10 @@ const userSchema = new Schema<IUser>({
     required: true, 
     enum: Object.values(ROLES)
   },
-  teams: [{ 
-    type: Schema.Types.ObjectId, 
-    ref: 'Team' 
-  }]
+  teamId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Team'
+  }
 }, {
   timestamps: true
 });
@@ -61,5 +61,9 @@ userSchema.pre('save', async function(next) {
     next(error as Error);
   }
 });
+
+// Index for faster queries
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ teamId: 1 });
 
 export const User = mongoose.model<IUser>('User', userSchema); 

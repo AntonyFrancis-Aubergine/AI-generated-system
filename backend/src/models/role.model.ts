@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 export interface IRole {
   name: string;
   description: string;
-  permissions: string[];
+  permissions: Types.ObjectId[];
   isDefault: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -23,9 +23,10 @@ const roleSchema = new mongoose.Schema<IRole>(
       trim: true,
     },
     permissions: {
-      type: [String],
+      type: [mongoose.Schema.Types.ObjectId],
       required: true,
       default: [],
+      ref: 'Permission'
     },
     isDefault: {
       type: Boolean,
@@ -36,9 +37,6 @@ const roleSchema = new mongoose.Schema<IRole>(
     timestamps: true,
   }
 );
-
-// Index for faster queries
-roleSchema.index({ name: 1 });
 
 // Prevent deletion of default roles
 roleSchema.pre('deleteOne', async function(this: mongoose.Document & IRole) {
@@ -60,6 +58,4 @@ roleSchema.post('deleteOne', async function(this: mongoose.Document & IRole) {
   }
 });
 
-const Role = mongoose.model<IRole>('Role', roleSchema);
-
-export default Role; 
+export const Role = mongoose.model<IRole>('Role', roleSchema); 

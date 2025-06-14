@@ -60,7 +60,9 @@ export const AUTH_MESSAGES = {
   TOKEN_EXPIRED: 'Token has expired',
   TOKEN_INVALID: 'Invalid token',
   INVALID_ROLE: 'Invalid role',
-  INSUFFICIENT_PERMISSIONS: 'Insufficient permissions'
+  EMAIL_ALREADY_EXISTS: 'Email already exists',
+  JWT_SECRET_MISSING: 'JWT secret is missing',
+  INSUFFICIENT_PERMISSIONS: 'Insufficient permissions',
 } as const;
 
 export const USER_MESSAGES = {
@@ -68,7 +70,8 @@ export const USER_MESSAGES = {
   UPDATED: 'User updated successfully',
   DELETED: 'User deleted successfully',
   NOT_FOUND: 'User not found',
-  EMAIL_EXISTS: 'Email already exists'
+  EMAIL_EXISTS: 'Email already exists',
+  INVALID_ROLE: 'Invalid role',
 } as const;
 
 export const TEAM_MESSAGES = {
@@ -79,7 +82,7 @@ export const TEAM_MESSAGES = {
   MEMBER_ADDED: 'Team member added successfully',
   MEMBER_REMOVED: 'Team member removed successfully',
   NAME_EXISTS: 'Team name already exists',
-  MEMBER_EXISTS: 'User is already a team member'
+  MEMBER_EXISTS: 'User is already a team member',
 } as const;
 
 export const PROJECT_MESSAGES = {
@@ -87,7 +90,7 @@ export const PROJECT_MESSAGES = {
   UPDATED: 'Project updated successfully',
   DELETED: 'Project deleted successfully',
   NOT_FOUND: 'Project not found',
-  NAME_EXISTS: 'Project name already exists'
+  NAME_EXISTS: 'Project name already exists',
 } as const;
 
 export const SPRINT_MESSAGES = {
@@ -105,5 +108,12 @@ export const TICKET_MESSAGES = {
   DELETED: 'Ticket deleted successfully',
   NOT_FOUND: 'Ticket not found',
   INVALID_STATUS: 'Invalid ticket status',
-  INVALID_PRIORITY: 'Invalid ticket priority'
+  INVALID_PRIORITY: 'Invalid ticket priority',
+  INVALID_TYPE: 'Invalid ticket type',
+} as const;
+
+export const ROLE_MESSAGES = {
+  NOT_FOUND: 'Role not found',
+  NAME_EXISTS: 'Role name already exists',
+  CANNOT_DELETE_DEFAULT: 'Cannot delete default role',
 } as const;
